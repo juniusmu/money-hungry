@@ -27,6 +27,7 @@ var tempSlashTrue = true
 
 let MAPWIDTH  = 50
 let MAPHEIGHT = 20
+var score: Int = 0
 
 // -- End Constants -- //
 
@@ -58,34 +59,90 @@ enum Direction: Int {
 
 class SlashProjectile{
     var currentChar = "\\"
-    var coord = Coord(x:49, y:9)
-    var dir: Direction{
-        return .left
+    var coord: Coord
+    
+    var dir: Direction
+    var numStages: Int = 4
+    var stage: Int = 0
+   
+    init(startingCoord: Coord, direction: Direction){
+        coord = startingCoord
+        dir = direction
     }
-}
+    
+    
 
-protocol MoveableObject {
-    var coordinate: Coord {get set}
+    func move(){
+        if self.dir == .left{
+            print("going left")
+            var stageInLife = self.stage % self.numStages
+            switch stageInLife{
+                case 0:
+                    self.coord = Coord(x: self.coord.x - 2, y: self.coord.y + 1)
+                    break
+                case 1:
+                    self.coord = Coord(x: self.coord.x - 2, y: self.coord.y - 1)
+                    break
+                case 2:
+                    self.coord = Coord(x: self.coord.x + 1, y: self.coord.y - 1)
+                    break
+                case 3:
+                    self.coord = Coord(x: self.coord.x - 2, y: self.coord.y + 1)
+                    break
+                default:
+                    break
+            }
+            stage = stage + 1
+            if self.currentChar == "\\"{
+                self.currentChar = "/"
+            }
+            else{
+                self.currentChar = "\\"
+            }
+        }
+        else{
+             print("going right")
+            var stageInLife = self.stage % self.numStages
+            switch stageInLife{
+            case 0:
+                self.coord = Coord(x: self.coord.x + 2, y: self.coord.y + 1)
+                break
+            case 1:
+                self.coord = Coord(x: self.coord.x + 2, y: self.coord.y - 1)
+                break
+            case 2:
+                self.coord = Coord(x: self.coord.x - 1, y: self.coord.y - 1)
+                break
+            case 3:
+                self.coord = Coord(x: self.coord.x + 2, y: self.coord.y + 1)
+                break
+            default:
+                break
+            }
+            stage = stage + 1
+            if self.currentChar == "\\"{
+                self.currentChar = "/"
+            }
+            else{
+                self.currentChar = "\\"
+            }
+        }
+        
+    }
 }
 
 class Snake{
-    var body = [ Coord(x: 0, y: 2), Coord(x: 0, y: 1), Coord(x: 0, y: 0)]
+    var body = [Coord(x: 0, y: 5), Coord(x: 0, y: 4),Coord(x: 0, y: 3), Coord(x: 0, y: 2), Coord(x: 0, y: 1), Coord(x: 0, y: 0)]
     var direction = Direction.down
-    var initialSnakeSize = 3
-    
-    func displayDeathMessage(_ message:String) -> Never {
-        print("Death: \(message)")
-        //    print("Score: \(score)")
-        exit(1)
-    }
-    
-    func generateNewFoodCoords() -> Coord {
-        return Coord(x: Int(arc4random_uniform(UInt32(MAPWIDTH))), y: Int(arc4random_uniform(UInt32(MAPHEIGHT))))
-    }
+    var initialSnakeSize = 2
+    var alive: Bool = true
     
     func move(nextDirection: Direction, deathDirection: Direction){
         if nextDirection == deathDirection{
-            displayDeathMessage("You got in your own way :(")
+//            displayDeathMessage("You got in your own way :(")
+            alive = false
+            print("Score: \(score)")
+            exit(1)
         }
         let newCoord: Coord?
         self.direction = nextDirection
@@ -103,20 +160,20 @@ class Snake{
             newCoord = Coord(x: self.body[0].x + 1, y: self.body[0].y)
         }
         else {
-            displayDeathMessage("You crashed into the wall")
+//            displayDeathMessage("You crashed into the wall")
+            alive = false
+            print("Score: \(score)")
+            exit(1)
         }
         
-        if !self.body.contains(newCoord!) { // does not remove last so the snake's size can grow by one
-            if newCoord == food {//delete last node if not touching food
-                food = generateNewFoodCoords()
-            }
-            else { // to make the snake the same length
-                self.body.removeLast()
-            }
+        if !self.body.contains(newCoord!) {
             self.body.insert(newCoord!, at: 0)
         }
         else {
-            displayDeathMessage("Self Collision")
+//            displayDeathMessage("Self Collision")
+            alive = false
+            print("Score: \(score)")
+            exit(1)
         }
         
         
@@ -125,98 +182,20 @@ class Snake{
 
 
 class Game {
-    var snake = Snake()
-    
-    var slashProjectile: SlashProjectile?
-    var score: Int {
-        return snake.body.count - snake.initialSnakeSize
+    func generateNewFoodCoords() -> Coord {
+        return Coord(x: Int(arc4random_uniform(UInt32(MAPWIDTH))), y: Int(arc4random_uniform(UInt32(MAPHEIGHT))))
     }
     
-//    func move() {
-//        func calculateNextLocation() -> Coord {
-//            // This function calculates where the snake should move and makes sure that the next movement is not off the screen.  It does NOT check to see if a part has crossed or if it is touching food.
-//
-//            if direction == .down && snake[0].y < MAPHEIGHT - 1 {
-//                return Coord(x: snake[0].x, y: snake[0].y + 1)
-//            }
-//            else if direction == .up && snake[0].y > 0 {
-//                return Coord(x: snake[0].x, y: snake[0].y - 1)
-//            }
-//            else if direction == .left && snake[0].x > 0 {
-//                return Coord(x: snake[0].x - 1, y: snake[0].y)
-//            }
-//            else if direction == .right && snake[0].x < MAPWIDTH - 1 {
-//                return Coord(x: snake[0].x + 1, y: snake[0].y)
-//            }
-//            else {
-//                displayDeathMessage("You crashed into the wall")
-//            }
-//        }
-//
-//        let nextCoord = calculateNextLocation()
-//
-//        if !snake.contains(nextCoord) { // does not remove last so the snake's size can grow by one
-//            if nextCoord == food {//delete last node if not touching food
-//                food = generateNewFoodCoords()
-//            }
-//            else { // to make the snake the same length
-//                snake.removeLast()
-//            }
-//            snake.insert(nextCoord, at: 0)
-//        }
-//        else {
-//            displayDeathMessage("Self Collision")
-//        }
-//
-//    }
+    var snake = Snake()
+    var firstLoad = true
+    var slashProjectile1: SlashProjectile?
+    var slashProjectile2: SlashProjectile?
+    var slashProjectile3: SlashProjectile?
+    
+   
     
 
     
-    
-
-//    func moveUp() {
-//        if direction != .down {
-//            direction = .up
-//            move();
-//        }
-//        else {
-//            displayDeathMessage("Self Collision")
-//        }
-//    }
-//
-//
-//    func moveDown() {
-//        if direction != .up {
-//            direction = .down
-//            move();
-//        }
-//        else {
-//            displayDeathMessage("Self Collision")
-//        }
-//    }
-//
-//
-//    func moveLeft() {
-//        if direction != .right {
-//            direction = .left
-//            move();
-//        }
-//        else {
-//            displayDeathMessage("Self Collision")
-//        }
-//    }
-//
-//
-//    func moveRight() {
-//        if direction != .left {
-//            direction = .right
-//            move();
-//        }
-//        else {
-//            displayDeathMessage("Self Collision")
-//        }
-//    }
-
     func drawMap() {
         func printLogo(){
             print(" _____                    _____                     ")
@@ -226,14 +205,58 @@ class Game {
             print("                  |___|                |___|   |___|")
         }
         
+        if snake.body.contains(food){
+            food = generateNewFoodCoords()
+            score = score + 1
+            
+        }
+        snake.body.removeLast()
+        
+        if let slashProjectile = slashProjectile1{
+            if snake.body.contains(slashProjectile.coord){
+                print("killed")
+                print("Score: \(score)")
+                exit(1)
+            }
+            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+                slashProjectile1 = nil
+            }
+        }
+        if let slashProjectile = slashProjectile2{
+            if snake.body.contains(slashProjectile.coord){
+                print("killed")
+                print("Score: \(score)")
+                exit(1)
+            }
+            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+                slashProjectile2 = nil
+            }
+        }
+        if let slashProjectile = slashProjectile3{
+            if snake.body.contains(slashProjectile.coord){
+                print("killed")
+                print("Score: \(score)")
+                exit(1)
+            }
+            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+                slashProjectile3 = nil
+            }
+        }
+        
+        
         print(String(repeating: "\n", count: 22))
-        printLogo()
+        if(firstLoad){
+            printLogo()
+            firstLoad = false
+        }
         print("+" + String(repeating: "-", count: MAPWIDTH) + "+")
         for y in 0 ..< MAPHEIGHT {
             print("|", terminator:"")
             for x in 0 ..< MAPWIDTH {
                 let coord = Coord(x: x, y: y)
                 var hasPrinted = false
+                var projectilePrinted = false
+                var coinPrinted = false
                 
                 if snake.body.contains(coord){
                     print("•", terminator:"")
@@ -242,17 +265,34 @@ class Game {
                 if !hasPrinted {
                     if food == coord {
                         print("¢", terminator:"")
+                        coinPrinted = true
                     }
-                    else if let projectile = slashProjectile{
+                    if let projectile = slashProjectile1{
                         if coord == projectile.coord{
                             print(projectile.currentChar, terminator:"")
-                            // move boomerang
+                            projectilePrinted = true
+
                         }
-                        else{
-                            print(" ", terminator:"")
-                        }
+                        
                     }
-                    else {
+                    if let projectile = slashProjectile2{
+                        
+                        if coord == projectile.coord{
+                            print(projectile.currentChar, terminator:"")
+                            projectilePrinted = true
+                            
+                        }
+                        
+                    }
+                    if let projectile = slashProjectile3{
+                        
+                        if coord == projectile.coord{
+                            print(projectile.currentChar, terminator:"")
+                            projectilePrinted = true
+                        }
+                        
+                    }
+                    if coinPrinted == false && projectilePrinted == false {
                         print(" ", terminator:"")
                     }
                 }
@@ -260,7 +300,17 @@ class Game {
             print("|\n", terminator:"")
         }
         print("+" + String(repeating: "-", count: MAPWIDTH) + "+")
+        if let projectile = slashProjectile1{
+            projectile.move()
+        }
+        if let projectile = slashProjectile2{
+            projectile.move()
+        }
+        if let projectile = slashProjectile3{
+            projectile.move()
+        }
     }
+    
     
 }
 
@@ -272,30 +322,87 @@ func displayDeathMessage(_ message:String) -> Never {
 }
 
 func playGame() {
+    
     let g = Game()
     g.drawMap()
     var l = ""
     while l != "q" {
         l = readLine() ?? ""
-        let currentDate = Date()
-        if(tempSlashTrue){
-            g.slashProjectile = SlashProjectile()
-            tempSlashTrue = false
+        
+        var weaponDeterminer = Int(arc4random_uniform(UInt32(20)))
+        
+        switch weaponDeterminer{ //randomly chooses which projectile to shoot out
+            case 0:
+                print("case 0")
+                if(g.slashProjectile1 == nil){
+                    var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
+                    if(sideDeterminer == 0){
+                        g.slashProjectile1 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
+                    }
+                    else{
+                        g.slashProjectile1 = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
+                    }
+                }
+            
+            case 1:
+                print("case 1")
+                if(g.slashProjectile2 == nil){
+                    var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
+                    if(sideDeterminer == 0){
+                        g.slashProjectile2 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
+                    }
+                    else{
+                        g.slashProjectile2 = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
+                    }
+                }
+            
+            case 2:
+                print("case 2")
+                if(g.slashProjectile3 == nil){
+                    var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
+                    if(sideDeterminer == 0){
+                        g.slashProjectile3 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
+                    }
+                    else{
+                        g.slashProjectile3 = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
+                    }
+                }
+            default:
+                break
         }
+        
+        let currentDate = Date()
+//        if(tempSlashTrue){
+//            var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
+//            if(sideDeterminer == 0){
+//                g.slashProjectile = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
+//            }
+//            else{
+//                g.slashProjectile = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
+//            }
+//
+//            tempSlashTrue = false
+//        }
         
         if firstMove{
             firstMove = false
             date = currentDate
         }
-        if currentDate > Date(timeInterval:1, since: date){
-            g.snake.displayDeathMessage("You took to long")
-            break
-        }
+        //        TODO: Uncomment this chunk of code later. kills player if she's taking to long
+        
+//        if currentDate > Date(timeInterval:1, since: date){
+//            g.snake.alive = false
+//            exit(1)
+////            g.snake.displayDeathMessage("You took to long")
+//            break
+//        }
         date = Date()
-        print("this is l")
         if (l != ""){
             if l == "w" || l == "a" || l == "s" || l == "d" {
                 lastPressedButton = l
+            }
+            else{
+                l = lastPressedButton
             }
         }
         else{
