@@ -1,6 +1,5 @@
 import Foundation
 var firstMove: Bool = true
-var tempSlashTrue = true
 
 //Todo: make it so that the move function is more broad, so other objects can use it
 
@@ -32,7 +31,7 @@ var score: Int = 0
 // -- End Constants -- //
 
 
-var lastPressedButton: String = "d"
+var lastPressedButton: String = "s"
 var seconds: Int = 0
 var minutes: Int = 0
 var hours: Int = 0
@@ -143,7 +142,7 @@ class SlashProjectile{
 }
 
 class Snake{
-    var body = [Coord(x: 0, y: 5), Coord(x: 0, y: 4),Coord(x: 0, y: 3), Coord(x: 0, y: 2), Coord(x: 0, y: 1), Coord(x: 0, y: 0)]
+    var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
     var direction = Direction.down
     var initialSnakeSize = 2
     var alive: Bool = true
