@@ -56,6 +56,19 @@ enum Direction: Int {
     case left
     case right
 }
+class ArrowProjectile{
+    var currentChar = "V"
+    var coord: Coord
+    
+    init(startingCoord: Coord){
+        coord = startingCoord
+    }
+    
+    func move(){
+        self.coord = Coord(x: self.coord.x, y: self.coord.y + 1)
+    }
+    
+}
 
 class SlashProjectile{
     var currentChar = "\\"
@@ -74,7 +87,6 @@ class SlashProjectile{
 
     func move(){
         if self.dir == .left{
-            print("going left")
             var stageInLife = self.stage % self.numStages
             switch stageInLife{
                 case 0:
@@ -101,7 +113,6 @@ class SlashProjectile{
             }
         }
         else{
-             print("going right")
             var stageInLife = self.stage % self.numStages
             switch stageInLife{
             case 0:
@@ -192,6 +203,10 @@ class Game {
     var slashProjectile2: SlashProjectile?
     var slashProjectile3: SlashProjectile?
     
+    var arrowProjectile1: ArrowProjectile?
+    var arrowProjectile2: ArrowProjectile?
+    var arrowProjectile3: ArrowProjectile?
+    
    
     
 
@@ -240,6 +255,36 @@ class Game {
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
                 slashProjectile3 = nil
+            }
+        }
+        if let arrowProjectile = arrowProjectile1{
+            if snake.body.contains(arrowProjectile.coord){
+                print("killed")
+                print("Score: \(score)")
+                exit(1)
+            }
+            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+                arrowProjectile1 = nil
+            }
+        }
+        if let arrowProjectile = arrowProjectile2{
+            if snake.body.contains(arrowProjectile.coord){
+                print("killed")
+                print("Score: \(score)")
+                exit(1)
+            }
+            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+                arrowProjectile2 = nil
+            }
+        }
+        if let arrowProjectile = arrowProjectile3{
+            if snake.body.contains(arrowProjectile.coord){
+                print("killed")
+                print("Score: \(score)")
+                exit(1)
+            }
+            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+                arrowProjectile3 = nil
             }
         }
         
@@ -292,6 +337,24 @@ class Game {
                         }
                         
                     }
+                    if let projectile = arrowProjectile1{
+                        if coord == projectile.coord{
+                            print(projectile.currentChar, terminator:"")
+                            projectilePrinted = true
+                        }
+                    }
+                    if let projectile = arrowProjectile2{
+                        if coord == projectile.coord{
+                            print(projectile.currentChar, terminator:"")
+                            projectilePrinted = true
+                        }
+                    }
+                    if let projectile = arrowProjectile3{
+                        if coord == projectile.coord{
+                            print(projectile.currentChar, terminator:"")
+                            projectilePrinted = true
+                        }
+                    }
                     if coinPrinted == false && projectilePrinted == false {
                         print(" ", terminator:"")
                     }
@@ -300,6 +363,7 @@ class Game {
             print("|\n", terminator:"")
         }
         print("+" + String(repeating: "-", count: MAPWIDTH) + "+")
+        print("Score: \(score)")
         if let projectile = slashProjectile1{
             projectile.move()
         }
@@ -307,6 +371,15 @@ class Game {
             projectile.move()
         }
         if let projectile = slashProjectile3{
+            projectile.move()
+        }
+        if let projectile = arrowProjectile1{
+            projectile.move()
+        }
+        if let projectile = arrowProjectile2{
+            projectile.move()
+        }
+        if let projectile = arrowProjectile3{
             projectile.move()
         }
     }
@@ -329,7 +402,7 @@ func playGame() {
     while l != "q" {
         l = readLine() ?? ""
         
-        var weaponDeterminer = Int(arc4random_uniform(UInt32(20)))
+        var weaponDeterminer = Int(arc4random_uniform(UInt32(5)))
         
         switch weaponDeterminer{ //randomly chooses which projectile to shoot out
             case 0:
@@ -345,7 +418,6 @@ func playGame() {
                 }
             
             case 1:
-                print("case 1")
                 if(g.slashProjectile2 == nil){
                     var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
                     if(sideDeterminer == 0){
@@ -355,9 +427,7 @@ func playGame() {
                         g.slashProjectile2 = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
                     }
                 }
-            
             case 2:
-                print("case 2")
                 if(g.slashProjectile3 == nil){
                     var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
                     if(sideDeterminer == 0){
@@ -367,22 +437,23 @@ func playGame() {
                         g.slashProjectile3 = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
                     }
                 }
+            case 3:
+                if(g.arrowProjectile1 == nil ){
+                    g.arrowProjectile1 = ArrowProjectile(startingCoord: Coord(x: Int(arc4random_uniform(UInt32(49))), y: 0))
+                }
+            case 4:
+                if(g.arrowProjectile2 == nil ){
+                    g.arrowProjectile2 = ArrowProjectile(startingCoord: Coord(x: Int(arc4random_uniform(UInt32(49))), y: 0))
+                }
+            case 5:
+                if(g.arrowProjectile3 == nil ){
+                    g.arrowProjectile3 = ArrowProjectile(startingCoord: Coord(x: Int(arc4random_uniform(UInt32(49))), y: 0))
+                }
             default:
                 break
         }
         
         let currentDate = Date()
-//        if(tempSlashTrue){
-//            var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
-//            if(sideDeterminer == 0){
-//                g.slashProjectile = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
-//            }
-//            else{
-//                g.slashProjectile = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
-//            }
-//
-//            tempSlashTrue = false
-//        }
         
         if firstMove{
             firstMove = false
