@@ -1,15 +1,14 @@
 import Foundation
-var firstMove: Bool = true
-
-//Todo: make it so that the move function is more broad, so other objects can use it
-
+let MAPWIDTH  = 50
+let MAPHEIGHT = 20
+var score: Int = 0
 // -- Constants -- //
 
-//Optionals ✅
+//Optionals ✅ 🐶
 //varatic parameters
 //nested functions ✅
 //closures
-//extensions
+//extensions 
 //Emojis 🐶 (CMD + CTRL + SPACE)
 // function return multiple values
 //operator overloading
@@ -18,25 +17,22 @@ var firstMove: Bool = true
 //Customizing argument labels
 //Enumerations  ✅
 //Protocols ✅
-//Guard and Defer
+//Guard and Defer ✅
 
 
-//codereview.stackexchange.com/questions/182367/console-based-snake-game
+// Influence by: codereview.stackexchange.com/questions/182367/console-based-snake-game
 
 
-let MAPWIDTH  = 50
-let MAPHEIGHT = 20
-var score: Int = 0
+var firstMove: Bool = true
+
 
 // -- End Constants -- //
 
 
 var lastPressedButton: String = "s"
-var seconds: Int = 0
-var minutes: Int = 0
-var hours: Int = 0
-var timeInSeconds: Int = 0
 var date: Date = Date()
+
+
 
 struct Coord: Equatable {
     let x: Int
@@ -69,6 +65,46 @@ class ArrowProjectile{
     
 }
 
+open class Snake{
+    var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
+    var direction = Direction.down
+    var initialSnakeSize = 2
+    
+    func move(nextDirection: Direction, deathDirection: Direction){
+        if nextDirection == deathDirection{
+            gameOverMessage("You Got In Your Own Way :(")
+        }
+        let newCoord: Coord?
+        self.direction = nextDirection
+        
+        if self.direction == .down && self.body[0].y < MAPHEIGHT - 1 {
+            newCoord = Coord(x: self.body[0].x, y: self.body[0].y + 1)
+        }
+        else if direction == .up && self.body[0].y > 0 {
+            newCoord = Coord(x: self.body[0].x, y: self.body[0].y - 1)
+        }
+        else if self.direction == .left && self.body[0].x > 0 {
+            newCoord = Coord(x: self.body[0].x - 1, y: self.body[0].y)
+        }
+        else if self.direction == .right && self.body[0].x < MAPWIDTH - 1 {
+            newCoord = Coord(x: self.body[0].x + 1, y: self.body[0].y)
+        }
+        else {
+//            displayDeathMessage("You crashed into the wall")
+            gameOverMessage("You Hit A Wall")
+        }
+        
+        if !self.body.contains(newCoord!) {
+            self.body.insert(newCoord!, at: 0)
+        }
+        else {
+            gameOverMessage("You Got In Your Own Way :(")
+        }
+        
+        
+    }
+}
+
 class SlashProjectile{
     var currentChar = "\\"
     var coord: Coord
@@ -86,7 +122,7 @@ class SlashProjectile{
 
     func move(){
         if self.dir == .left{
-            var stageInLife = self.stage % self.numStages
+            let stageInLife = self.stage % self.numStages
             switch stageInLife{
                 case 0:
                     self.coord = Coord(x: self.coord.x - 2, y: self.coord.y + 1)
@@ -112,7 +148,7 @@ class SlashProjectile{
             }
         }
         else{
-            var stageInLife = self.stage % self.numStages
+            let stageInLife = self.stage % self.numStages
             switch stageInLife{
             case 0:
                 self.coord = Coord(x: self.coord.x + 2, y: self.coord.y + 1)
@@ -141,61 +177,11 @@ class SlashProjectile{
     }
 }
 
-class Snake{
-    var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
-    var direction = Direction.down
-    var initialSnakeSize = 2
-    var alive: Bool = true
     
-    func move(nextDirection: Direction, deathDirection: Direction){
-        if nextDirection == deathDirection{
-//            displayDeathMessage("You got in your own way :(")
-            alive = false
-            print("Score: \(score)")
-            exit(1)
-        }
-        let newCoord: Coord?
-        self.direction = nextDirection
-        
-        if self.direction == .down && self.body[0].y < MAPHEIGHT - 1 {
-            newCoord = Coord(x: self.body[0].x, y: self.body[0].y + 1)
-        }
-        else if direction == .up && self.body[0].y > 0 {
-            newCoord = Coord(x: self.body[0].x, y: self.body[0].y - 1)
-        }
-        else if self.direction == .left && self.body[0].x > 0 {
-            newCoord = Coord(x: self.body[0].x - 1, y: self.body[0].y)
-        }
-        else if self.direction == .right && self.body[0].x < MAPWIDTH - 1 {
-            newCoord = Coord(x: self.body[0].x + 1, y: self.body[0].y)
-        }
-        else {
-//            displayDeathMessage("You crashed into the wall")
-            alive = false
-            print("Score: \(score)")
-            exit(1)
-        }
-        
-        if !self.body.contains(newCoord!) {
-            self.body.insert(newCoord!, at: 0)
-        }
-        else {
-//            displayDeathMessage("Self Collision")
-            alive = false
-            print("Score: \(score)")
-            exit(1)
-        }
         
         
-    }
-}
-
-
 class Game {
-    func generateNewFoodCoords() -> Coord {
-        return Coord(x: Int(arc4random_uniform(UInt32(MAPWIDTH))), y: Int(arc4random_uniform(UInt32(MAPHEIGHT))))
-    }
-    
+
     var snake = Snake()
     var firstLoad = true
     var slashProjectile1: SlashProjectile?
@@ -204,12 +190,12 @@ class Game {
     
     var arrowProjectile1: ArrowProjectile?
     var arrowProjectile2: ArrowProjectile?
-    var arrowProjectile3: ArrowProjectile?
-    
-   
-    
+    var arrowProjectile3: ArrowProjectile? 
 
-    
+    func generateNewFoodCoords() -> Coord {
+        return Coord(x: Int(arc4random_uniform(UInt32(MAPWIDTH-15))) + 5, y: Int(arc4random_uniform(UInt32(MAPHEIGHT - 10 ))) + 5)
+    }
+
     func drawMap() {
         func printLogo(){
             print(" _____                    _____                     ")
@@ -387,27 +373,20 @@ class Game {
 }
 
 
-func displayDeathMessage(_ message:String) -> Never {
-    print("Death: \(message)")
-//    print("Score: \(score)")
-    exit(1)
-}
-
 func playGame() {
-    
+
+        
     let g = Game()
     g.drawMap()
     var l = ""
     while l != "q" {
         l = readLine() ?? ""
-        
-        var weaponDeterminer = Int(arc4random_uniform(UInt32(5)))
+        let weaponDeterminer = Int(arc4random_uniform(UInt32(5)))
         
         switch weaponDeterminer{ //randomly chooses which projectile to shoot out
             case 0:
-                print("case 0")
                 if(g.slashProjectile1 == nil){
-                    var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
+                    let sideDeterminer = Int(arc4random_uniform(UInt32(2)))
                     if(sideDeterminer == 0){
                         g.slashProjectile1 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
                     }
@@ -418,7 +397,7 @@ func playGame() {
             
             case 1:
                 if(g.slashProjectile2 == nil){
-                    var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
+                    let sideDeterminer = Int(arc4random_uniform(UInt32(2)))
                     if(sideDeterminer == 0){
                         g.slashProjectile2 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
                     }
@@ -428,7 +407,7 @@ func playGame() {
                 }
             case 2:
                 if(g.slashProjectile3 == nil){
-                    var sideDeterminer = Int(arc4random_uniform(UInt32(2)))
+                    let sideDeterminer = Int(arc4random_uniform(UInt32(2)))
                     if(sideDeterminer == 0){
                         g.slashProjectile3 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
                     }
@@ -452,20 +431,18 @@ func playGame() {
                 break
         }
         
+        
         let currentDate = Date()
         
         if firstMove{
             firstMove = false
             date = currentDate
         }
-        //        TODO: Uncomment this chunk of code later. kills player if she's taking to long
         
-//        if currentDate > Date(timeInterval:1, since: date){
-//            g.snake.alive = false
-//            exit(1)
-////            g.snake.displayDeathMessage("You took to long")
-//            break
-//        }
+       if currentDate > Date(timeInterval:1, since: date){
+           gameOverMessage("Took Too Long To Make A Decision")
+           break
+       }
         date = Date()
         if (l != ""){
             if l == "w" || l == "a" || l == "s" || l == "d" {
@@ -494,4 +471,37 @@ func playGame() {
     }
 }
 
-playGame()
+func gameOverMessage(_ message: String) -> Never{
+    print("Game Over: \(message)")
+    print("Score: \(score)")
+    exit(1)
+}
+
+// playGame()
+func testGetRequest(){
+    print("testGetRequest")
+    let url = URL(string: "http://0.0.0.0:8080/hello")
+    let task = URLSession.shared.dataTask(with: url!){ (data, response, error) in
+        if let data = data {
+            do{
+                let jsonSerialized = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                if let json = jsonSerialized, let name = json["name"], let email = json["email"]{
+                    print(name)
+                    print(email)
+
+                }
+            }
+            catch let error as NSError{
+                print(error.localizedDescription)
+            }
+        } else if let error = error{
+            print(error.localizedDescription)
+        }
+
+    }
+
+    task.resume()
+}
+
+testGetRequest()
+RunLoop.main.run()
