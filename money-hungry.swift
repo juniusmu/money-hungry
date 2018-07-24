@@ -5,18 +5,7 @@ var score: Int = 0
 var l = ""
 // -- Constants -- //
 
-//Optionals ✅ 🐶
-//varadic parameters
-//nested functions ✅ 🐶
-//closures
-//extensions 
-//Emojis 🐶 (CMD + CTRL + SPACE)
-// function return multiple values
-//operator overloading
-//Underscore to ignore values ✅
-//Customizing argument labels 🐶
-//Protocols ✅
-//Guard and Defer ✅
+
 
 
 // Influence by: codereview.stackexchange.com/questions/182367/console-based-snake-game
