@@ -2,20 +2,19 @@ import Foundation
 let MAPWIDTH  = 50
 let MAPHEIGHT = 20
 var score: Int = 0
+var l = ""
 // -- Constants -- //
 
 //Optionals ✅ 🐶
-//varatic parameters
-//nested functions ✅
+//varadic parameters
+//nested functions ✅ 🐶
 //closures
 //extensions 
 //Emojis 🐶 (CMD + CTRL + SPACE)
 // function return multiple values
 //operator overloading
-// math in string interpolation ✅
 //Underscore to ignore values ✅
-//Customizing argument labels
-//Enumerations  ✅
+//Customizing argument labels 🐶
 //Protocols ✅
 //Guard and Defer ✅
 
@@ -27,6 +26,15 @@ var firstMove: Bool = true
 
 
 // -- End Constants -- //
+struct User: Codable{
+    let id: Int
+    let username: String
+    let score: Int
+}
+struct List: Codable{
+    let list: [User]
+}
+
 
 
 var lastPressedButton: String = "s"
@@ -73,6 +81,7 @@ open class Snake{
     func move(nextDirection: Direction, deathDirection: Direction){
         if nextDirection == deathDirection{
             gameOverMessage("You Got In Your Own Way :(")
+            return
         }
         let newCoord: Coord?
         self.direction = nextDirection
@@ -92,6 +101,7 @@ open class Snake{
         else {
 //            displayDeathMessage("You crashed into the wall")
             gameOverMessage("You Hit A Wall")
+            return
         }
         
         if !self.body.contains(newCoord!) {
@@ -99,6 +109,7 @@ open class Snake{
         }
         else {
             gameOverMessage("You Got In Your Own Way :(")
+            return
         }
         
         
@@ -216,7 +227,9 @@ class Game {
             if snake.body.contains(slashProjectile.coord){
                 print("killed")
                 print("Score: \(score)")
-                exit(1)
+                l = "q"
+                return
+                // exit(1)
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
                 slashProjectile1 = nil
@@ -226,7 +239,9 @@ class Game {
             if snake.body.contains(slashProjectile.coord){
                 print("killed")
                 print("Score: \(score)")
-                exit(1)
+                l = "q"
+                return
+                // exit(1)
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
                 slashProjectile2 = nil
@@ -236,7 +251,9 @@ class Game {
             if snake.body.contains(slashProjectile.coord){
                 print("killed")
                 print("Score: \(score)")
-                exit(1)
+                l = "q"
+                return
+                // exit(1)
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
                 slashProjectile3 = nil
@@ -246,7 +263,9 @@ class Game {
             if snake.body.contains(arrowProjectile.coord){
                 print("killed")
                 print("Score: \(score)")
-                exit(1)
+                l = "q"
+                return
+                // exit(1)
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
                 arrowProjectile1 = nil
@@ -256,7 +275,8 @@ class Game {
             if snake.body.contains(arrowProjectile.coord){
                 print("killed")
                 print("Score: \(score)")
-                exit(1)
+                l = "q"
+                // exit(1)
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
                 arrowProjectile2 = nil
@@ -266,7 +286,9 @@ class Game {
             if snake.body.contains(arrowProjectile.coord){
                 print("killed")
                 print("Score: \(score)")
-                exit(1)
+                l = "q"
+                return
+                // exit(1)
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
                 arrowProjectile3 = nil
@@ -378,7 +400,7 @@ func playGame() {
         
     let g = Game()
     g.drawMap()
-    var l = ""
+
     while l != "q" {
         l = readLine() ?? ""
         let weaponDeterminer = Int(arc4random_uniform(UInt32(5)))
@@ -471,25 +493,41 @@ func playGame() {
     }
 }
 
-func gameOverMessage(_ message: String) -> Never{
+func gameOverMessage(_ message: String){
     print("Game Over: \(message)")
     print("Score: \(score)")
-    exit(1)
+    l = "q"
+    // exit(1)
 }
 
 // playGame()
 func testGetRequest(){
-    print("testGetRequest")
-    let url = URL(string: "http://0.0.0.0:8080/hello")
+    // print("testGetRequest")
+    let url = URL(string: "http://0.0.0.0:8080/api/allleaderboarditem")
     let task = URLSession.shared.dataTask(with: url!){ (data, response, error) in
         if let data = data {
+            
+            // let dataAsString = String(data: data, encoding: .utf8)
+            // print("dataAsString")
+            // print(dataAsString)
             do{
-                let jsonSerialized = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                if let json = jsonSerialized, let name = json["name"], let email = json["email"]{
-                    print(name)
-                    print(email)
+                var playerScores: [(username:String, score:Int)] = []
+               if let json = try? JSONSerialization.jsonObject(with: data, options:[]) as? [[String: Any]]{
+                    for i in json!{
+                        let u = i["username"] as! String
+                        let s = i["score"] as! Int
+                        playerScores.append((u,s))
+                    }
+                    let sortedPlayers = playerScores.sorted(by: {$0.1 > $1.1})
+                    print("Top Players")
+                    for i in 0...sortedPlayers.count{
+                        if(i > 4){
+                            break
+                        }
+                        print("\(sortedPlayers[i].0): \(sortedPlayers[i].1)")
+                    }
+               }
 
-                }
             }
             catch let error as NSError{
                 print(error.localizedDescription)
@@ -503,5 +541,76 @@ func testGetRequest(){
     task.resume()
 }
 
+struct Post: Codable {
+    let username: String
+    let score: Int
+}
+
+
+
+    // We'll need a completion block that returns an error if we run into any problems
+func submitPost(post: Post, completion:((Error?) -> Void)?) {
+    guard let url = URL(string:"http://0.0.0.0:8080/api/leaderboarditem")else{return}
+    
+    // Specify this request as being a POST method
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    // Make sure that we include headers specifying that our request's HTTP body 
+    // will be JSON encoded
+    var headers = request.allHTTPHeaderFields ?? [:]
+    headers["Content-Type"] = "application/json"
+    request.allHTTPHeaderFields = headers
+    
+    // Now let's encode out Post struct into JSON data...
+    let encoder = JSONEncoder()
+    do {
+        let jsonData = try encoder.encode(post)
+        // ... and set our request's HTTP body
+        request.httpBody = jsonData
+        // print("jsonData: ", String(data: request.httpBody!, encoding: .utf8) ?? "no body data")
+    } catch {
+        completion?(error)
+    }
+    
+    // Create and run a URLSession data task with our JSON encoded POST request
+    let config = URLSessionConfiguration.default
+    let session = URLSession(configuration: config)
+    let task = session.dataTask(with: request) { (responseData, response, responseError) in
+        guard responseError == nil else {
+            completion?(responseError!)
+            return
+        }
+        
+        // APIs usually respond with the data you just sent in your POST request
+        if let data = responseData, let utf8Representation = String(data: data, encoding: .utf8) {
+            // print("response: ", utf8Representation)
+        } else {
+            print("no readable data received in response")
+        }
+    }
+    task.resume()
+}
+
+var playerUsername: String?
+func enterName(){
+    print("Enter Name: " )
+    playerUsername = readLine() ?? ""
+}
+
+enterName()
+playGame()
+
+let myPost = Post(username: playerUsername!, score: score)
+submitPost(post: myPost){ (error) in
+    if let error = error {
+        fatalError(error.localizedDescription)
+    }
+}
+var d = Date()
+RunLoop.main.run(until: Date(timeInterval:3, since: d))
 testGetRequest()
-RunLoop.main.run()
+d = Date()
+RunLoop.main.run(until: Date(timeInterval:3, since: d))
+
+// testGetRequest()
+// testPostRequest()
