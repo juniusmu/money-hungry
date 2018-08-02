@@ -9,26 +9,12 @@ var l = ""
 
 
 // Influence by: codereview.stackexchange.com/questions/182367/console-based-snake-game
-
-
 var firstMove: Bool = true
-
-
-// -- End Constants -- //
-struct User: Codable{
-    let id: Int
-    let username: String
-    let score: Int
-}
-struct List: Codable{
-    let list: [User]
-}
-
-
-
 var lastPressedButton: String = "s"
 var date: Date = Date()
 
+// curses
+//canvas mac app if curses doesn't work
 
 
 struct Coord: Equatable {
@@ -48,19 +34,7 @@ enum Direction: Int {
     case left
     case right
 }
-class ArrowProjectile{
-    var currentChar = "V"
-    var coord: Coord
-    
-    init(startingCoord: Coord){
-        coord = startingCoord
-    }
-    
-    func move(){
-        self.coord = Coord(x: self.coord.x, y: self.coord.y + 1)
-    }
-    
-}
+
 
 open class Snake{
     var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
@@ -88,7 +62,6 @@ open class Snake{
             newCoord = Coord(x: self.body[0].x + 1, y: self.body[0].y)
         }
         else {
-//            displayDeathMessage("You crashed into the wall")
             gameOverMessage("You Hit A Wall")
             return
         }
@@ -100,27 +73,24 @@ open class Snake{
             gameOverMessage("You Got In Your Own Way :(")
             return
         }
-        
-        
     }
 }
 
-class SlashProjectile{
-    var currentChar = "\\"
-    var coord: Coord
-    
-    var dir: Direction
-    var numStages: Int = 4
-    var stage: Int = 0
-   
-    init(startingCoord: Coord, direction: Direction){
-        coord = startingCoord
-        dir = direction
-    }
-    
-    
+protocol Projectile{
+    var currentChar: String {get set}
+    var coord: Coord {get set}
+}
 
-    func move(){
+protocol CircularMovement: Projectile{ 
+    var dir: Direction {get}
+    var coord: Coord {get set}
+    var numStages: Int {get set}
+    var phaseCharacters: [String] {get}
+    var stage: Int {get set}
+}
+
+extension CircularMovement{ // take away the move function from SlashProjectile
+    mutating func move(){ //phaseCharacters have to be in the correct order
         if self.dir == .left{
             let stageInLife = self.stage % self.numStages
             switch stageInLife{
@@ -173,7 +143,32 @@ class SlashProjectile{
                 self.currentChar = "\\"
             }
         }
-        
+    }
+}
+
+class ArrowProjectile: Projectile{
+    var currentChar = "V"
+    var coord: Coord
+    init(startingCoord: Coord){
+        coord = startingCoord
+    }
+    
+    func move(){
+        self.coord = Coord(x: self.coord.x, y: self.coord.y + 1)
+    } 
+}
+
+class SlashProjectile: Projectile, CircularMovement{
+    var currentChar: String = "/"
+    var coord: Coord
+    var dir: Direction
+    var numStages: Int = 4
+    var stage: Int = 0
+    var phaseCharacters: [String] = ["\\", "/"]
+   
+    init(startingCoord: Coord, direction: Direction){
+        coord = startingCoord
+        dir = direction
     }
 }
 
@@ -181,7 +176,6 @@ class SlashProjectile{
         
         
 class Game {
-
     var snake = Snake()
     var firstLoad = true
     var slashProjectile1: SlashProjectile?
@@ -360,33 +354,29 @@ class Game {
         }
         print("+" + String(repeating: "-", count: MAPWIDTH) + "+")
         print("Score: \(score)")
-        if let projectile = slashProjectile1{
+        if var projectile = slashProjectile1{
             projectile.move()
         }
-        if let projectile = slashProjectile2{
+        if var projectile = slashProjectile2{
             projectile.move()
         }
-        if let projectile = slashProjectile3{
+        if var projectile = slashProjectile3{
             projectile.move()
         }
-        if let projectile = arrowProjectile1{
+        if var projectile = arrowProjectile1{
             projectile.move()
         }
-        if let projectile = arrowProjectile2{
+        if var projectile = arrowProjectile2{
             projectile.move()
         }
-        if let projectile = arrowProjectile3{
+        if var projectile = arrowProjectile3{
             projectile.move()
         }
-    }
-    
-    
+    }  
 }
 
 
-func playGame() {
-
-        
+func playGame() { 
     let g = Game()
     g.drawMap()
 
@@ -449,11 +439,11 @@ func playGame() {
             firstMove = false
             date = currentDate
         }
-        
-       if currentDate > Date(timeInterval:1, since: date){
-           gameOverMessage("Took Too Long To Make A Decision")
-           break
-       }
+    // uncomment this code if you want timed death
+    //    if currentDate > Date(timeInterval:1, since: date){
+    //        gameOverMessage("Took Too Long To Make A Decision")
+    //        break
+    //    }
         date = Date()
         if (l != ""){
             if l == "w" || l == "a" || l == "s" || l == "d" {
@@ -490,15 +480,11 @@ func gameOverMessage(_ message: String){
 }
 
 // playGame()
-func testGetRequest(){
+func getRequest(){
     // print("testGetRequest")
     let url = URL(string: "http://0.0.0.0:8080/api/allleaderboarditem")
     let task = URLSession.shared.dataTask(with: url!){ (data, response, error) in
         if let data = data {
-            
-            // let dataAsString = String(data: data, encoding: .utf8)
-            // print("dataAsString")
-            // print(dataAsString)
             do{
                 var playerScores: [(username:String, score:Int)] = []
                if let json = try? JSONSerialization.jsonObject(with: data, options:[]) as? [[String: Any]]{
@@ -526,7 +512,6 @@ func testGetRequest(){
         }
 
     }
-
     task.resume()
 }
 
@@ -534,13 +519,9 @@ struct Post: Codable {
     let username: String
     let score: Int
 }
-
-
-
     // We'll need a completion block that returns an error if we run into any problems
 func submitPost(post: Post, completion:((Error?) -> Void)?) {
     guard let url = URL(string:"http://0.0.0.0:8080/api/leaderboarditem")else{return}
-    
     // Specify this request as being a POST method
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
@@ -556,11 +537,9 @@ func submitPost(post: Post, completion:((Error?) -> Void)?) {
         let jsonData = try encoder.encode(post)
         // ... and set our request's HTTP body
         request.httpBody = jsonData
-        // print("jsonData: ", String(data: request.httpBody!, encoding: .utf8) ?? "no body data")
     } catch {
         completion?(error)
     }
-    
     // Create and run a URLSession data task with our JSON encoded POST request
     let config = URLSessionConfiguration.default
     let session = URLSession(configuration: config)
@@ -569,7 +548,6 @@ func submitPost(post: Post, completion:((Error?) -> Void)?) {
             completion?(responseError!)
             return
         }
-        
         // APIs usually respond with the data you just sent in your POST request
         if let data = responseData, let utf8Representation = String(data: data, encoding: .utf8) {
             // print("response: ", utf8Representation)
@@ -597,9 +575,6 @@ submitPost(post: myPost){ (error) in
 }
 var d = Date()
 RunLoop.main.run(until: Date(timeInterval:3, since: d))
-testGetRequest()
+getRequest()
 d = Date()
 RunLoop.main.run(until: Date(timeInterval:3, since: d))
-
-// testGetRequest()
-// testPostRequest()
