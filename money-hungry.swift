@@ -38,14 +38,8 @@ enum Direction: Int {
 
 open class Snake{
     var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
-    var direction = Direction.down
-    var initialSnakeSize = 2
-    
-    func move(nextDirection: Direction, deathDirection: Direction){
-        if nextDirection == deathDirection{
-            gameOverMessage("You Got In Your Own Way :(")
-            return
-        }
+    var direction = Direction.down    
+    func move(nextDirection: Direction){
         let newCoord: Coord?
         self.direction = nextDirection
         
@@ -67,6 +61,7 @@ open class Snake{
         }
         
         if !self.body.contains(newCoord!) {
+            print("body count: \(body.count)")
             self.body.insert(newCoord!, at: 0)
         }
         else {
@@ -172,9 +167,6 @@ class SlashProjectile: Projectile, CircularMovement{
     }
 }
 
-    
-        
-        
 class Game {
     var snake = Snake()
     var firstLoad = true
@@ -212,7 +204,6 @@ class Game {
                 print("Score: \(score)")
                 l = "q"
                 return
-                // exit(1)
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
                 slashProjectile1 = nil
@@ -224,7 +215,6 @@ class Game {
                 print("Score: \(score)")
                 l = "q"
                 return
-                // exit(1)
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
                 slashProjectile2 = nil
@@ -236,7 +226,6 @@ class Game {
                 print("Score: \(score)")
                 l = "q"
                 return
-                // exit(1)
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
                 slashProjectile3 = nil
@@ -248,7 +237,6 @@ class Game {
                 print("Score: \(score)")
                 l = "q"
                 return
-                // exit(1)
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
                 arrowProjectile1 = nil
@@ -259,7 +247,6 @@ class Game {
                 print("killed")
                 print("Score: \(score)")
                 l = "q"
-                // exit(1)
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
                 arrowProjectile2 = nil
@@ -271,7 +258,6 @@ class Game {
                 print("Score: \(score)")
                 l = "q"
                 return
-                // exit(1)
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
                 arrowProjectile3 = nil
@@ -289,15 +275,15 @@ class Game {
             print("|", terminator:"")
             for x in 0 ..< MAPWIDTH {
                 let coord = Coord(x: x, y: y)
-                var hasPrinted = false
+                var snakeLimbPrinted = false
                 var projectilePrinted = false
                 var coinPrinted = false
                 
                 if snake.body.contains(coord){
                     print("•", terminator:"")
-                    hasPrinted = true
+                    snakeLimbPrinted = true
                 }
-                if !hasPrinted {
+                if !snakeLimbPrinted {
                     if food == coord {
                         print("¢", terminator:"")
                         coinPrinted = true
@@ -354,6 +340,7 @@ class Game {
         }
         print("+" + String(repeating: "-", count: MAPWIDTH) + "+")
         print("Score: \(score)")
+        // projectiles need to move after the looping
         if var projectile = slashProjectile1{
             projectile.move()
         }
@@ -376,12 +363,13 @@ class Game {
 }
 
 
-func playGame() { 
-    let g = Game()
-    g.drawMap()
 
-    while l != "q" {
-        l = readLine() ?? ""
+func playGame() { 
+    g.drawMap()
+    l = "s"
+    // while l != "q" {
+        // TODO: Uncomment this line of code or you won't be able to add in directions
+        // l = readLine() ?? ""
         let weaponDeterminer = Int(arc4random_uniform(UInt32(5)))
         
         switch weaponDeterminer{ //randomly chooses which projectile to shoot out
@@ -431,8 +419,6 @@ func playGame() {
             default:
                 break
         }
-        
-        
         let currentDate = Date()
         
         if firstMove{
@@ -458,28 +444,28 @@ func playGame() {
         }
         switch l{
             case "w":
-                g.snake.move(nextDirection: .up, deathDirection: .down)
+                g.snake.move(nextDirection: .up)
             case "a":
-                g.snake.move(nextDirection: .left, deathDirection: .right)
+                g.snake.move(nextDirection: .left)
             case "s":
-                g.snake.move(nextDirection: .down, deathDirection: .up)
+                g.snake.move(nextDirection: .down)
             case "d":
-                g.snake.move(nextDirection: .right, deathDirection: .left)
+                g.snake.move(nextDirection: .right)
             default:
                 break
         }
-        g.drawMap()
-    }
+        // g.drawMap()
+    // }
 }
 
 func gameOverMessage(_ message: String){
     print("Game Over: \(message)")
     print("Score: \(score)")
     l = "q"
-    // exit(1)
+    exit(1)
 }
-
-// playGame()
+let g = Game()
+g.drawMap()
 func getRequest(){
     // print("testGetRequest")
     let url = URL(string: "http://0.0.0.0:8080/api/allleaderboarditem")
@@ -564,9 +550,26 @@ func enterName(){
     playerUsername = readLine() ?? ""
 }
 
-enterName()
-playGame()
+// enterName()
+// playGame()
 
+// temp testing TODO: Use the below logic in a separate thread, then have the user text entry in another thread
+var x = 0
+print("the game should start")
+var dee = Date()
+playGame()
+while(x == x){
+    var cd = Date()
+    // print("dee: \(dee)")
+    // print("cd: \(cd)")
+    if cd > Date(timeInterval:1, since:dee){
+        dee = Date()
+        playGame()
+    }
+}
+print("the game should be way over by now")
+exit(1)
+// temp testing
 let myPost = Post(username: playerUsername!, score: score)
 submitPost(post: myPost){ (error) in
     if let error = error {
