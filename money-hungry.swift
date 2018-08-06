@@ -66,6 +66,7 @@ class Snake{
         
         if !self.body.contains(newCoord!) {
             self.body.insert(newCoord!, at: 0)
+            self.body.removeLast()
         }
         else {
             gameOverMessage("You Got In Your Own Way :(")
@@ -108,12 +109,7 @@ extension CircularMovement{ // take away the move function from SlashProjectile
                     break
             }
             stage = stage + 1
-            if self.currentChar == "\\"{
-                self.currentChar = "/"
-            }
-            else{
-                self.currentChar = "\\"
-            }
+            self.currentChar = self.phaseCharacters[stage % self.phaseCharacters.count]
         }
         else{
             let stageInLife = self.stage % self.numStages
@@ -134,12 +130,7 @@ extension CircularMovement{ // take away the move function from SlashProjectile
                 break
             }
             stage = stage + 1
-            if self.currentChar == "\\"{
-                self.currentChar = "/"
-            }
-            else{
-                self.currentChar = "\\"
-            }
+            self.currentChar = self.phaseCharacters[stage % self.phaseCharacters.count]
         }
     }
 }
@@ -288,7 +279,7 @@ class Game {
             score = score + 1
             
         }
-        snake.body.removeLast()
+        // snake.body.removeLast()
         deleteOffMapProjectiles()
         
         print(String(repeating: "\n", count: 22))
@@ -550,8 +541,6 @@ func submitPost(post: Post, completion:((Error?) -> Void)?) {
     }
     task.resume()
 }
-
-
 
 var playerUsername: String?
 func enterName(){
