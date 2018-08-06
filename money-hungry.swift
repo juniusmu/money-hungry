@@ -1,9 +1,18 @@
 import Foundation
+import Cocoa
 let MAPWIDTH  = 50
 let MAPHEIGHT = 20
 var score: Int = 0
 var l = ""
 // -- Constants -- //
+
+
+class ViewController: NSViewController {
+    override func keyDown(with event: NSEvent){
+        print("IS THIS ACTUALLY WORKING, LET ME KNOW")
+        print(type(of:event))
+    }
+}
 
 
 
@@ -211,9 +220,10 @@ class Game {
         }
         if let slashProjectile = slashProjectile2{
             if snake.body.contains(slashProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
+                gameOverMessage("killed")
+                // print("killed")
+                // print("Score: \(score)")
+                // l = "q"
                 return
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
@@ -222,9 +232,10 @@ class Game {
         }
         if let slashProjectile = slashProjectile3{
             if snake.body.contains(slashProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
+                gameOverMessage("killed")
+                // print("killed")
+                // print("Score: \(score)")
+                // l = "q"
                 return
             }
             if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
@@ -233,9 +244,10 @@ class Game {
         }
         if let arrowProjectile = arrowProjectile1{
             if snake.body.contains(arrowProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
+                gameOverMessage("killed")
+                // print("killed")
+                // print("Score: \(score)")
+                // l = "q"
                 return
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
@@ -244,9 +256,10 @@ class Game {
         }
         if let arrowProjectile = arrowProjectile2{
             if snake.body.contains(arrowProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
+                gameOverMessage("killed")
+                // print("killed")
+                // print("Score: \(score)")
+                // l = "q"
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
                 arrowProjectile2 = nil
@@ -254,9 +267,10 @@ class Game {
         }
         if let arrowProjectile = arrowProjectile3{
             if snake.body.contains(arrowProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
+                gameOverMessage("killed")
+                // print("killed")
+                // print("Score: \(score)")
+                // l = "q"
                 return
             }
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
@@ -366,7 +380,7 @@ class Game {
 
 func playGame() { 
     g.drawMap()
-    l = "s"
+    // l = "s"
     // while l != "q" {
         // TODO: Uncomment this line of code or you won't be able to add in directions
         // l = readLine() ?? ""
@@ -549,35 +563,48 @@ func enterName(){
     print("Enter Name: " )
     playerUsername = readLine() ?? ""
 }
+var  tempBool = false
+class LoopThread: Thread {
+  override func main() {
+    var x = 0
+    print("the game should start")
+    var dee = Date()
+    playGame()
+    while(x == x){
+        var cd = Date()
+        // print("dee: \(dee)")
+        // print("cd: \(cd)")
+        if cd > Date(timeInterval:1, since:dee){
+            dee = Date()
+            playGame()
+        }
+    }
+  }
+}
 
+let loopThread = LoopThread()
+loopThread.start()
+while tempBool == false{
+    l = readLine() ?? ""
+}
 // enterName()
 // playGame()
 
 // temp testing TODO: Use the below logic in a separate thread, then have the user text entry in another thread
-var x = 0
-print("the game should start")
-var dee = Date()
-playGame()
-while(x == x){
-    var cd = Date()
-    // print("dee: \(dee)")
-    // print("cd: \(cd)")
-    if cd > Date(timeInterval:1, since:dee){
-        dee = Date()
-        playGame()
-    }
-}
-print("the game should be way over by now")
-exit(1)
+
+// print("the game should be way over by now")
+// exit(1)
 // temp testing
-let myPost = Post(username: playerUsername!, score: score)
-submitPost(post: myPost){ (error) in
-    if let error = error {
-        fatalError(error.localizedDescription)
-    }
-}
-var d = Date()
-RunLoop.main.run(until: Date(timeInterval:3, since: d))
-getRequest()
-d = Date()
-RunLoop.main.run(until: Date(timeInterval:3, since: d))
+
+
+// let myPost = Post(username: playerUsername!, score: score)
+// submitPost(post: myPost){ (error) in
+//     if let error = error {
+//         fatalError(error.localizedDescription)
+//     }
+// }
+// var d = Date()
+// RunLoop.main.run(until: Date(timeInterval:3, since: d))
+// getRequest()
+// d = Date()
+// RunLoop.main.run(until: Date(timeInterval:3, since: d))
