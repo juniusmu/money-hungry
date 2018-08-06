@@ -443,11 +443,10 @@ func playGame() {
             firstMove = false
             date = currentDate
         }
-    // uncomment this code if you want timed death
-    //    if currentDate > Date(timeInterval:1, since: date){
-    //        gameOverMessage("Took Too Long To Make A Decision")
-    //        break
-    //    }
+       if currentDate > Date(timeInterval:1, since: date){
+           gameOverMessage("Took Too Long To Make A Decision")
+           break
+       }
         date = Date()
         if (l != ""){
             if l == "w" || l == "a" || l == "s" || l == "d" {
@@ -483,7 +482,6 @@ func gameOverMessage(_ message: String){
 }
 
 func getRequest(){
-    // print("testGetRequest")
     let url = URL(string: "http://0.0.0.0:8080/api/allleaderboarditem")
     let task = URLSession.shared.dataTask(with: url!){ (data, response, error) in
         if let data = data {
@@ -504,7 +502,6 @@ func getRequest(){
                         print("\(sortedPlayers[i].0): \(sortedPlayers[i].1)")
                     }
                }
-
             }
             catch let error as NSError{
                 print(error.localizedDescription)
@@ -524,25 +521,20 @@ struct Post: Codable {
     // We'll need a completion block that returns an error if we run into any problems
 func submitPost(post: Post, completion:((Error?) -> Void)?) {
     guard let url = URL(string:"http://0.0.0.0:8080/api/leaderboarditem")else{return}
-    // Specify this request as being a POST method
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
-    // Make sure that we include headers specifying that our request's HTTP body 
-    // will be JSON encoded
+
     var headers = request.allHTTPHeaderFields ?? [:]
     headers["Content-Type"] = "application/json"
     request.allHTTPHeaderFields = headers
     
-    // Now let's encode out Post struct into JSON data...
     let encoder = JSONEncoder()
     do {
         let jsonData = try encoder.encode(post)
-        // ... and set our request's HTTP body
         request.httpBody = jsonData
     } catch {
         completion?(error)
     }
-    // Create and run a URLSession data task with our JSON encoded POST request
     let config = URLSessionConfiguration.default
     let session = URLSession(configuration: config)
     let task = session.dataTask(with: request) { (responseData, response, responseError) in
@@ -550,7 +542,6 @@ func submitPost(post: Post, completion:((Error?) -> Void)?) {
             completion?(responseError!)
             return
         }
-        // APIs usually respond with the data you just sent in your POST request
         if let data = responseData, let utf8Representation = String(data: data, encoding: .utf8) {
             // print("response: ", utf8Representation)
         } else {
@@ -559,6 +550,8 @@ func submitPost(post: Post, completion:((Error?) -> Void)?) {
     }
     task.resume()
 }
+
+
 
 var playerUsername: String?
 func enterName(){
@@ -569,14 +562,14 @@ func enterName(){
 enterName()
 playGame()
 
-let myPost = Post(username: playerUsername!, score: score)
-submitPost(post: myPost){ (error) in
+let playerScore = Post(username: playerUsername!, score: score)
+submitPost(post: playerScore){ (error) in
     if let error = error {
         fatalError(error.localizedDescription)
     }
 }
-var d = Date()
-RunLoop.main.run(until: Date(timeInterval:3, since: d))
+var currentTime = Date()
+RunLoop.main.run(until: Date(timeInterval:1, since: currentTime))
 getRequest()
-d = Date()
-RunLoop.main.run(until: Date(timeInterval:3, since: d))
+currentTime = Date()
+RunLoop.main.run(until: Date(timeInterval:1, since: currentTime))
