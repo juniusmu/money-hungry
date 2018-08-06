@@ -36,11 +36,9 @@ enum Direction: Int {
 }
 
 
-open class Snake{
+class Snake{
     var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
     var direction = Direction.down
-    var initialSnakeSize = 2
-    
     func move(nextDirection: Direction, deathDirection: Direction){
         if nextDirection == deathDirection{
             gameOverMessage("You Got In Your Own Way :(")
@@ -189,8 +187,94 @@ class Game {
     func generateNewFoodCoords() -> Coord {
         return Coord(x: Int(arc4random_uniform(UInt32(MAPWIDTH-15))) + 5, y: Int(arc4random_uniform(UInt32(MAPHEIGHT - 10 ))) + 5)
     }
+    func isPlayerKilled() -> Bool {
+        if let slashProjectile = slashProjectile1{
+            if snake.body.contains(slashProjectile.coord){
+                return true
+            }
+        }
+        if let slashProjectile = slashProjectile2{
+            if snake.body.contains(slashProjectile.coord){
+                return true
+            }
+        }
+        if let slashProjectile = slashProjectile3{
+            if snake.body.contains(slashProjectile.coord){
+                return true
+            }
+        }
+        if let arrowProjectile = arrowProjectile1{
+            if snake.body.contains(arrowProjectile.coord){
+                return true
+            }
+        }
+        if let arrowProjectile = arrowProjectile2{
+            if snake.body.contains(arrowProjectile.coord){
+                return true
+            }
+        }
+        if let arrowProjectile = arrowProjectile3{
+            if snake.body.contains(arrowProjectile.coord){
+                return true
+            }
+        }
+        return false
+    }
+    func deleteOffMapProjectiles(){
+        if let slashProjectile = slashProjectile1{
+            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+                slashProjectile1 = nil
+            }
+        }
+        if let slashProjectile = slashProjectile2{
+            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+                slashProjectile2 = nil
+            }
+        }
+        if let slashProjectile = slashProjectile3{
+            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+                slashProjectile3 = nil
+            }
+        }
+        if let arrowProjectile = arrowProjectile1{
+            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+                arrowProjectile1 = nil
+            }
+        }
+        if let arrowProjectile = arrowProjectile2{
+            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+                arrowProjectile2 = nil
+            }
+        }
+        if let arrowProjectile = arrowProjectile3{
+            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+                arrowProjectile3 = nil
+            }
+        } 
+    }
+    
+    func updateProjectilePosition(){
+        if var projectile = slashProjectile1{
+            projectile.move()
+        }
+        if var projectile = slashProjectile2{
+            projectile.move()
+        }
+        if var projectile = slashProjectile3{
+            projectile.move()
+        }
+        if var projectile = arrowProjectile1{
+            projectile.move()
+        }
+        if var projectile = arrowProjectile2{
+            projectile.move()
+        }
+        if var projectile = arrowProjectile3{
+            projectile.move()
+        }
+    }
 
-    func drawMap() {
+    func drawMap(){
         func printLogo(){
             print(" _____                    _____                     ")
             print("|     |___ ___ ___ _ _   |  |  |_ _ ___ ___ ___ _ _ ")
@@ -205,79 +289,7 @@ class Game {
             
         }
         snake.body.removeLast()
-        
-        if let slashProjectile = slashProjectile1{
-            if snake.body.contains(slashProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
-                return
-                // exit(1)
-            }
-            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
-                slashProjectile1 = nil
-            }
-        }
-        if let slashProjectile = slashProjectile2{
-            if snake.body.contains(slashProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
-                return
-                // exit(1)
-            }
-            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
-                slashProjectile2 = nil
-            }
-        }
-        if let slashProjectile = slashProjectile3{
-            if snake.body.contains(slashProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
-                return
-                // exit(1)
-            }
-            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
-                slashProjectile3 = nil
-            }
-        }
-        if let arrowProjectile = arrowProjectile1{
-            if snake.body.contains(arrowProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
-                return
-                // exit(1)
-            }
-            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
-                arrowProjectile1 = nil
-            }
-        }
-        if let arrowProjectile = arrowProjectile2{
-            if snake.body.contains(arrowProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
-                // exit(1)
-            }
-            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
-                arrowProjectile2 = nil
-            }
-        }
-        if let arrowProjectile = arrowProjectile3{
-            if snake.body.contains(arrowProjectile.coord){
-                print("killed")
-                print("Score: \(score)")
-                l = "q"
-                return
-                // exit(1)
-            }
-            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
-                arrowProjectile3 = nil
-            }
-        }
-        
+        deleteOffMapProjectiles()
         
         print(String(repeating: "\n", count: 22))
         if(firstLoad){
@@ -289,19 +301,20 @@ class Game {
             print("|", terminator:"")
             for x in 0 ..< MAPWIDTH {
                 let coord = Coord(x: x, y: y)
-                var hasPrinted = false
                 var projectilePrinted = false
                 var coinPrinted = false
-                
+                var snakeBodyPartIsThere = false
+
                 if snake.body.contains(coord){
-                    print("•", terminator:"")
-                    hasPrinted = true
+                    snakeBodyPartIsThere = true
                 }
-                if !hasPrinted {
+                if !snakeBodyPartIsThere {
                     if food == coord {
                         print("¢", terminator:"")
                         coinPrinted = true
                     }
+                }
+                if !coinPrinted {
                     if let projectile = slashProjectile1{
                         if coord == projectile.coord{
                             print(projectile.currentChar, terminator:"")
@@ -345,33 +358,24 @@ class Game {
                             projectilePrinted = true
                         }
                     }
-                    if coinPrinted == false && projectilePrinted == false {
-                        print(" ", terminator:"")
-                    }
+                }
+                if(!projectilePrinted && snakeBodyPartIsThere){
+                    print("•", terminator:"")
+                }
+                if !coinPrinted && !projectilePrinted && !snakeBodyPartIsThere {
+                    print(" ", terminator:"")
                 }
             }
             print("|\n", terminator:"")
         }
+        
         print("+" + String(repeating: "-", count: MAPWIDTH) + "+")
         print("Score: \(score)")
-        if var projectile = slashProjectile1{
-            projectile.move()
+        if isPlayerKilled() {
+            gameOverMessage("Killed")
+            return
         }
-        if var projectile = slashProjectile2{
-            projectile.move()
-        }
-        if var projectile = slashProjectile3{
-            projectile.move()
-        }
-        if var projectile = arrowProjectile1{
-            projectile.move()
-        }
-        if var projectile = arrowProjectile2{
-            projectile.move()
-        }
-        if var projectile = arrowProjectile3{
-            projectile.move()
-        }
+        updateProjectilePosition()
     }  
 }
 
@@ -476,10 +480,8 @@ func gameOverMessage(_ message: String){
     print("Game Over: \(message)")
     print("Score: \(score)")
     l = "q"
-    // exit(1)
 }
 
-// playGame()
 func getRequest(){
     // print("testGetRequest")
     let url = URL(string: "http://0.0.0.0:8080/api/allleaderboarditem")
