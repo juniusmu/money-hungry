@@ -90,48 +90,29 @@ protocol CircularMovement: Projectile{
 
 extension CircularMovement{ // take away the move function from SlashProjectile
     mutating func move(){ //phaseCharacters have to be in the correct order
+        var xVal = 1
         if self.dir == .left{
-            let stageInLife = self.stage % self.numStages
-            switch stageInLife{
-                case 0:
-                    self.coord = Coord(x: self.coord.x - 2, y: self.coord.y + 1)
-                    break
-                case 1:
-                    self.coord = Coord(x: self.coord.x - 2, y: self.coord.y - 1)
-                    break
-                case 2:
-                    self.coord = Coord(x: self.coord.x + 1, y: self.coord.y - 1)
-                    break
-                case 3:
-                    self.coord = Coord(x: self.coord.x - 2, y: self.coord.y + 1)
-                    break
-                default:
-                    break
-            }
-            stage = stage + 1
-            self.currentChar = self.phaseCharacters[stage % self.phaseCharacters.count]
+            xVal = -1
         }
-        else{
-            let stageInLife = self.stage % self.numStages
-            switch stageInLife{
+        let stageInLife = self.stage % self.numStages
+        switch stageInLife{
             case 0:
-                self.coord = Coord(x: self.coord.x + 2, y: self.coord.y + 1)
+                self.coord = Coord(x: self.coord.x + 2 * xVal, y: self.coord.y + 1)
                 break
             case 1:
-                self.coord = Coord(x: self.coord.x + 2, y: self.coord.y - 1)
+                self.coord = Coord(x: self.coord.x + 2 * xVal, y: self.coord.y - 1)
                 break
             case 2:
-                self.coord = Coord(x: self.coord.x - 1, y: self.coord.y - 1)
+                self.coord = Coord(x: self.coord.x - 1 * xVal, y: self.coord.y - 1)
                 break
             case 3:
-                self.coord = Coord(x: self.coord.x + 2, y: self.coord.y + 1)
+                self.coord = Coord(x: self.coord.x + 2 * xVal, y: self.coord.y + 1)
                 break
             default:
                 break
-            }
-            stage = stage + 1
-            self.currentChar = self.phaseCharacters[stage % self.phaseCharacters.count]
         }
+        stage = stage + 1
+        self.currentChar = self.phaseCharacters[stage % self.phaseCharacters.count]
     }
 }
 
