@@ -3,10 +3,6 @@ let MAPWIDTH  = 50
 let MAPHEIGHT = 20
 var score: Int = 0
 var l = ""
-// -- Constants -- //
-
-
-
 
 // Influence by: codereview.stackexchange.com/questions/182367/console-based-snake-game
 var firstMove: Bool = true
