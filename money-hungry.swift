@@ -31,37 +31,23 @@ enum Direction: Int {
 class Snake{
     var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
     var direction = Direction.down
-    func move(nextDirection: Direction, deathDirection: Direction){
+    func move(nextDirection: Direction){
         let newCoord: Coord?
         self.direction = nextDirection
         
-        // check if the snake is off the map
-        if self.direction == .down && self.body[0].y < MAPHEIGHT - 1 {
-            newCoord = Coord(x: self.body[0].x, y: self.body[0].y + 1)
-        }
-        else if direction == .up && self.body[0].y > 0 {
+        switch self.direction{
+           case .up:
             newCoord = Coord(x: self.body[0].x, y: self.body[0].y - 1)
-        }
-        else if self.direction == .left && self.body[0].x > 0 {
+            break
+           case .down:
+            newCoord = Coord(x: self.body[0].x, y: self.body[0].y + 1)
+           case .left:
             newCoord = Coord(x: self.body[0].x - 1, y: self.body[0].y)
-        }
-        else if self.direction == .right && self.body[0].x < MAPWIDTH - 1 {
+           case .right:
             newCoord = Coord(x: self.body[0].x + 1, y: self.body[0].y)
-        }
-        else {
-            gameOverMessage("You Hit A Wall")
-            return
         }
         self.body.insert(newCoord!, at: 0)
         self.body.removeLast()
-        // if !self.body.contains(newCoord!) {
-        //     self.body.insert(newCoord!, at: 0)
-        //     self.body.removeLast()
-        // }
-        // else {
-        //     gameOverMessage("You Got In Your Own Way :(")
-        //     return
-        // }
     }
 }
 
@@ -156,9 +142,22 @@ class Game {
             }
             return false
         }
+        func isSnakeOutOfBounds() -> Bool{
+            var snakeHead = snake.body[0]
+            if(snakeHead.y > MAPHEIGHT - 1 || snakeHead.y < 0 ||
+            snakeHead.x > MAPWIDTH - 1 || snakeHead.x < 0){
+                return true
+            }
+            return false
+        }
+
         if isSnakeOverlapping(){
             gameOverMessage("You Got In Your Own Way :(")
         }
+        if isSnakeOutOfBounds(){
+            gameOverMessage("You hit a wall")
+        }
+
     }
 
 
@@ -443,13 +442,13 @@ func playGame() {
         }
         switch l{
             case "w":
-                g.snake.move(nextDirection: .up, deathDirection: .down)
+                g.snake.move(nextDirection: .up)
             case "a":
-                g.snake.move(nextDirection: .left, deathDirection: .right)
+                g.snake.move(nextDirection: .left)
             case "s":
-                g.snake.move(nextDirection: .down, deathDirection: .up)
+                g.snake.move(nextDirection: .down)
             case "d":
-                g.snake.move(nextDirection: .right, deathDirection: .left)
+                g.snake.move(nextDirection: .right)
             default:
                 break
         }
@@ -460,6 +459,6 @@ func playGame() {
 func gameOverMessage(_ message: String){
     print("Game Over: \(message)")
     print("Score: \(score)")
-    l = "q"
+    exit(1)
 }
 playGame()
