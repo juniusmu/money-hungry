@@ -9,10 +9,6 @@ var firstMove: Bool = true
 var lastPressedButton: String = "s"
 var date: Date = Date()
 
-// curses
-//canvas mac app if curses doesn't work
-
-
 struct Coord: Equatable {
     let x: Int
     let y: Int
@@ -36,13 +32,10 @@ class Snake{
     var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
     var direction = Direction.down
     func move(nextDirection: Direction, deathDirection: Direction){
-        if nextDirection == deathDirection{
-            gameOverMessage("You Got In Your Own Way :(")
-            return
-        }
         let newCoord: Coord?
         self.direction = nextDirection
         
+        // check if the snake is off the map
         if self.direction == .down && self.body[0].y < MAPHEIGHT - 1 {
             newCoord = Coord(x: self.body[0].x, y: self.body[0].y + 1)
         }
@@ -59,15 +52,16 @@ class Snake{
             gameOverMessage("You Hit A Wall")
             return
         }
-        
-        if !self.body.contains(newCoord!) {
-            self.body.insert(newCoord!, at: 0)
-            self.body.removeLast()
-        }
-        else {
-            gameOverMessage("You Got In Your Own Way :(")
-            return
-        }
+        self.body.insert(newCoord!, at: 0)
+        self.body.removeLast()
+        // if !self.body.contains(newCoord!) {
+        //     self.body.insert(newCoord!, at: 0)
+        //     self.body.removeLast()
+        // }
+        // else {
+        //     gameOverMessage("You Got In Your Own Way :(")
+        //     return
+        // }
     }
 }
 
@@ -84,8 +78,8 @@ protocol CircularMovement: Projectile{
     var stage: Int {get set}
 }
 
-extension CircularMovement{ // take away the move function from SlashProjectile
-    mutating func move(){ //phaseCharacters have to be in the correct order
+extension CircularMovement{
+    mutating func move(){
         var xVal = 1
         if self.dir == .left{
             xVal = -1
@@ -151,6 +145,22 @@ class Game {
     var arrowProjectile1: ArrowProjectile?
     var arrowProjectile2: ArrowProjectile?
     var arrowProjectile3: ArrowProjectile? 
+
+    func isGameOver(){
+        func isSnakeOverlapping() -> Bool{
+            for limb in snake.body{
+                var limbsWithSameCoord = snake.body.filter{$0 == limb}
+                if limbsWithSameCoord.count > 1{
+                    return true
+                }
+            }
+            return false
+        }
+        if isSnakeOverlapping(){
+            gameOverMessage("You Got In Your Own Way :(")
+        }
+    }
+
 
     func generateNewFoodCoords() -> Coord {
         return Coord(x: Int(arc4random_uniform(UInt32(MAPWIDTH-15))) + 5, y: Int(arc4random_uniform(UInt32(MAPHEIGHT - 10 ))) + 5)
@@ -243,6 +253,7 @@ class Game {
     }
 
     func drawMap(){
+        
         func printLogo(){
             print(" _____                    _____                     ")
             print("|     |___ ___ ___ _ _   |  |  |_ _ ___ ___ ___ _ _ ")
@@ -250,16 +261,18 @@ class Game {
             print("|_|_|_|___|_|_|___|_  |  |__|__|___|_|_|_  |_| |_  |")
             print("                  |___|                |___|   |___|")
         }
+
         
         if snake.body.contains(food){
             food = generateNewFoodCoords()
             score = score + 1
             
         }
-        // snake.body.removeLast()
+        
         deleteOffMapProjectiles()
         
         print(String(repeating: "\n", count: 22))
+        isGameOver()
         if(firstLoad){
             printLogo()
             firstLoad = false
@@ -411,10 +424,11 @@ func playGame() {
             firstMove = false
             date = currentDate
         }
-       if currentDate > Date(timeInterval:1, since: date){
-           gameOverMessage("Took Too Long To Make A Decision")
-           break
-       }
+        // uncomment when i want the timer turned back on
+    //    if currentDate > Date(timeInterval:1, since: date){
+    //        gameOverMessage("Took Too Long To Make A Decision")
+    //        break
+    //    }
         date = Date()
         if (l != ""){
             if l == "w" || l == "a" || l == "s" || l == "d" {
@@ -448,94 +462,4 @@ func gameOverMessage(_ message: String){
     print("Score: \(score)")
     l = "q"
 }
-
-func getRequest(){
-    let url = URL(string: "http://0.0.0.0:8080/api/allleaderboarditem")
-    let task = URLSession.shared.dataTask(with: url!){ (data, response, error) in
-        if let data = data {
-            do{
-                var playerScores: [(username:String, score:Int)] = []
-               if let json = try? JSONSerialization.jsonObject(with: data, options:[]) as? [[String: Any]]{
-                    for i in json!{
-                        let u = i["username"] as! String
-                        let s = i["score"] as! Int
-                        playerScores.append((u,s))
-                    }
-                    let sortedPlayers = playerScores.sorted(by: {$0.1 > $1.1})
-                    print("Top Players")
-                    for i in 0...sortedPlayers.count{
-                        if(i > 4){
-                            break
-                        }
-                        print("\(sortedPlayers[i].0): \(sortedPlayers[i].1)")
-                    }
-               }
-            }
-            catch let error as NSError{
-                print(error.localizedDescription)
-            }
-        } else if let error = error{
-            print(error.localizedDescription)
-        }
-
-    }
-    task.resume()
-}
-
-struct Post: Codable {
-    let username: String
-    let score: Int
-}
-    // We'll need a completion block that returns an error if we run into any problems
-func submitPost(post: Post, completion:((Error?) -> Void)?) {
-    guard let url = URL(string:"http://0.0.0.0:8080/api/leaderboarditem")else{return}
-    var request = URLRequest(url: url)
-    request.httpMethod = "POST"
-
-    var headers = request.allHTTPHeaderFields ?? [:]
-    headers["Content-Type"] = "application/json"
-    request.allHTTPHeaderFields = headers
-    
-    let encoder = JSONEncoder()
-    do {
-        let jsonData = try encoder.encode(post)
-        request.httpBody = jsonData
-    } catch {
-        completion?(error)
-    }
-    let config = URLSessionConfiguration.default
-    let session = URLSession(configuration: config)
-    let task = session.dataTask(with: request) { (responseData, response, responseError) in
-        guard responseError == nil else {
-            completion?(responseError!)
-            return
-        }
-        if let data = responseData, let utf8Representation = String(data: data, encoding: .utf8) {
-            // print("response: ", utf8Representation)
-        } else {
-            print("no readable data received in response")
-        }
-    }
-    task.resume()
-}
-
-var playerUsername: String?
-func enterName(){
-    print("Enter Name: " )
-    playerUsername = readLine() ?? ""
-}
-
-enterName()
 playGame()
-
-let playerScore = Post(username: playerUsername!, score: score)
-submitPost(post: playerScore){ (error) in
-    if let error = error {
-        fatalError(error.localizedDescription)
-    }
-}
-var currentTime = Date()
-RunLoop.main.run(until: Date(timeInterval:1, since: currentTime))
-getRequest()
-currentTime = Date()
-RunLoop.main.run(until: Date(timeInterval:1, since: currentTime))
