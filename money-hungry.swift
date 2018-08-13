@@ -132,6 +132,8 @@ class Game {
     var arrowProjectile2: ArrowProjectile?
     var arrowProjectile3: ArrowProjectile? 
 
+    
+
     func isGameOver(){
         func isSnakeOverlapping() -> Bool{
             for limb in snake.body{
@@ -150,12 +152,18 @@ class Game {
             }
             return false
         }
-
+        func isSnakeHitWithProjectile() -> Bool{
+            return false
+        }
         if isSnakeOverlapping(){
             gameOverMessage("You Got In Your Own Way :(")
         }
         if isSnakeOutOfBounds(){
             gameOverMessage("You hit a wall")
+        }
+        if isPlayerKilled() {
+            gameOverMessage("Killed")
+            return
         }
 
     }
@@ -164,35 +172,23 @@ class Game {
     func generateNewFoodCoords() -> Coord {
         return Coord(x: Int(arc4random_uniform(UInt32(MAPWIDTH-15))) + 5, y: Int(arc4random_uniform(UInt32(MAPHEIGHT - 10 ))) + 5)
     }
+    func isProjectileAttackingSnake(projectile: Projectile) -> Bool{
+        return snake.body.contains(projectile.coord)
+    }
     func isPlayerKilled() -> Bool {
-        if let slashProjectile = slashProjectile1{
-            if snake.body.contains(slashProjectile.coord){
-                return true
-            }
-        }
-        if let slashProjectile = slashProjectile2{
-            if snake.body.contains(slashProjectile.coord){
-                return true
-            }
-        }
-        if let slashProjectile = slashProjectile3{
-            if snake.body.contains(slashProjectile.coord){
-                return true
-            }
-        }
-        if let arrowProjectile = arrowProjectile1{
-            if snake.body.contains(arrowProjectile.coord){
-                return true
-            }
-        }
-        if let arrowProjectile = arrowProjectile2{
-            if snake.body.contains(arrowProjectile.coord){
-                return true
-            }
-        }
-        if let arrowProjectile = arrowProjectile3{
-            if snake.body.contains(arrowProjectile.coord){
-                return true
+        var projectiles = [Projectile?]()
+        projectiles.append(slashProjectile1)
+        projectiles.append(slashProjectile2)
+        projectiles.append(slashProjectile3)
+        projectiles.append(arrowProjectile1)
+        projectiles.append(arrowProjectile2)
+        projectiles.append(arrowProjectile3)
+
+        for projectile in projectiles{
+            if let projectile = projectile{
+                if(isProjectileAttackingSnake(projectile: projectile)){
+                    return true
+                }
             }
         }
         return false
@@ -351,10 +347,6 @@ class Game {
         
         print("+" + String(repeating: "-", count: MAPWIDTH) + "+")
         print("Score: \(score)")
-        if isPlayerKilled() {
-            gameOverMessage("Killed")
-            return
-        }
         updateProjectilePosition()
     }  
 }
@@ -423,11 +415,11 @@ func playGame() {
             firstMove = false
             date = currentDate
         }
-        // uncomment when i want the timer turned back on
-    //    if currentDate > Date(timeInterval:1, since: date){
-    //        gameOverMessage("Took Too Long To Make A Decision")
-    //        break
-    //    }
+        uncomment when i want the timer turned back on
+       if currentDate > Date(timeInterval:1, since: date){
+           gameOverMessage("Took Too Long To Make A Decision")
+           break
+       }
         date = Date()
         if (l != ""){
             if l == "w" || l == "a" || l == "s" || l == "d" {
