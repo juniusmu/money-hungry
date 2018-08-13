@@ -351,6 +351,17 @@ class Game {
     }  
 }
 
+func tutorial(){
+     print(String(repeating: "\n", count: 100))
+        print("This is a game where you are a snake.")
+        print("Your goal is to avoid all of the obstacles.")
+        print("And rack up as much money as you can.")
+        print(" 'W' 'A' 'S' 'D' are the direction keys.")
+        print("Once you type in your direction, press the enter key to execute it")
+        print("If you take to long to move, you will die.")
+        print("press ENTER to start game.")
+        l = readLine() ?? ""
+}
 
 func playGame() { 
     let g = Game()
@@ -415,7 +426,6 @@ func playGame() {
             firstMove = false
             date = currentDate
         }
-        uncomment when i want the timer turned back on
        if currentDate > Date(timeInterval:1, since: date){
            gameOverMessage("Took Too Long To Make A Decision")
            break
@@ -453,4 +463,7 @@ func gameOverMessage(_ message: String){
     print("Score: \(score)")
     exit(1)
 }
+
+
+tutorial()
 playGame()
