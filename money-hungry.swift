@@ -137,7 +137,7 @@ class Game {
     func isGameOver(){
         func isSnakeOverlapping() -> Bool{
             for limb in snake.body{
-                var limbsWithSameCoord = snake.body.filter{$0 == limb}
+                let limbsWithSameCoord = snake.body.filter{$0 == limb}
                 if limbsWithSameCoord.count > 1{
                     return true
                 }
@@ -145,7 +145,7 @@ class Game {
             return false
         }
         func isSnakeOutOfBounds() -> Bool{
-            var snakeHead = snake.body[0]
+            let snakeHead = snake.body[0]
             if(snakeHead.y > MAPHEIGHT - 1 || snakeHead.y < 0 ||
             snakeHead.x > MAPWIDTH - 1 || snakeHead.x < 0){
                 return true
@@ -236,13 +236,13 @@ class Game {
         if var projectile = slashProjectile3{
             projectile.move()
         }
-        if var projectile = arrowProjectile1{
+        if let projectile = arrowProjectile1{
             projectile.move()
         }
-        if var projectile = arrowProjectile2{
+        if let projectile = arrowProjectile2{
             projectile.move()
         }
-        if var projectile = arrowProjectile3{
+        if let projectile = arrowProjectile3{
             projectile.move()
         }
     }
