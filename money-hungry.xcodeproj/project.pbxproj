@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		9D7F9D1525B641F400A43ED5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D1425B641F400A43ED5 /* main.swift */; };
-		9D7F9D2325B646CE00A43ED5 /* money_hungry_tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D2225B646CE00A43ED5 /* money_hungry_tests.swift */; };
 		9D7F9D3025B6493B00A43ED5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D1425B641F400A43ED5 /* main.swift */; };
+		9DF8803025B6535400896BF6 /* money_hungry_tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D2225B646CE00A43ED5 /* money_hungry_tests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,8 +53,8 @@
 		9D7F9D0825B641F400A43ED5 = {
 			isa = PBXGroup;
 			children = (
-				9D7F9D1325B641F400A43ED5 /* money-hungry */,
-				9D7F9D2125B646CE00A43ED5 /* money-hungry-tests */,
+				9D7F9D1325B641F400A43ED5 /* app */,
+				9D7F9D2125B646CE00A43ED5 /* tests */,
 				9D7F9D1225B641F400A43ED5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -68,21 +68,21 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9D7F9D1325B641F400A43ED5 /* money-hungry */ = {
+		9D7F9D1325B641F400A43ED5 /* app */ = {
 			isa = PBXGroup;
 			children = (
 				9D7F9D1425B641F400A43ED5 /* main.swift */,
 			);
-			path = "money-hungry";
+			path = app;
 			sourceTree = "<group>";
 		};
-		9D7F9D2125B646CE00A43ED5 /* money-hungry-tests */ = {
+		9D7F9D2125B646CE00A43ED5 /* tests */ = {
 			isa = PBXGroup;
 			children = (
 				9D7F9D2225B646CE00A43ED5 /* money_hungry_tests.swift */,
 				9D7F9D2425B646CE00A43ED5 /* Info.plist */,
 			);
-			path = "money-hungry-tests";
+			path = tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -182,7 +182,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D7F9D3025B6493B00A43ED5 /* main.swift in Sources */,
-				9D7F9D2325B646CE00A43ED5 /* money_hungry_tests.swift in Sources */,
+				9DF8803025B6535400896BF6 /* money_hungry_tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,6 +308,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "$(SRCROOT)/tests/Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -317,6 +318,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "$(SRCROOT)/tests/Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -327,7 +329,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "money-hungry-tests/Info.plist";
+				INFOPLIST_FILE = tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -344,7 +346,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "money-hungry-tests/Info.plist";
+				INFOPLIST_FILE = tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
