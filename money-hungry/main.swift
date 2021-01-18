@@ -1,3 +1,11 @@
+//
+//  main.swift
+//  money-hungry
+//
+//
+
+import Foundation
+
 import Foundation
 let MAPWIDTH  = 50
 let MAPHEIGHT = 20
@@ -56,7 +64,7 @@ protocol Projectile{
     var coord: Coord {get set}
 }
 
-protocol CircularMovement: Projectile{ 
+protocol CircularMovement: Projectile{
     var dir: Direction {get}
     var coord: Coord {get set}
     var numStages: Int {get set}
@@ -101,7 +109,7 @@ class ArrowProjectile: Projectile{
     
     func move(){
         self.coord = Coord(x: self.coord.x, y: self.coord.y + 1)
-    } 
+    }
 }
 
 class SlashProjectile: Projectile, CircularMovement{
@@ -130,7 +138,7 @@ class Game {
     
     var arrowProjectile1: ArrowProjectile?
     var arrowProjectile2: ArrowProjectile?
-    var arrowProjectile3: ArrowProjectile? 
+    var arrowProjectile3: ArrowProjectile?
 
     
 
@@ -223,7 +231,7 @@ class Game {
             if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
                 arrowProjectile3 = nil
             }
-        } 
+        }
     }
     
     func updateProjectilePosition(){
@@ -348,7 +356,7 @@ class Game {
         print("+" + String(repeating: "-", count: MAPWIDTH) + "+")
         print("Score: \(score)")
         updateProjectilePosition()
-    }  
+    }
 }
 
 func tutorial(){
@@ -363,7 +371,7 @@ func tutorial(){
         l = readLine() ?? ""
 }
 
-func playGame() { 
+func playGame() {
     let g = Game()
     g.drawMap()
 
