@@ -10,23 +10,23 @@ import Foundation
 let MAPWIDTH  = 50
 let MAPHEIGHT = 20
 var score: Int = 0
-var l = ""
+var userInput = ""
 
 // Influence by: codereview.stackexchange.com/questions/182367/console-based-snake-game
 var firstMove: Bool = true
 var lastPressedButton: String = "s"
 var date: Date = Date()
 
-struct Coord: Equatable {
+struct Coordinate: Equatable {
     let x: Int
     let y: Int
 
-    static func ==(lhs: Coord, rhs: Coord) -> Bool {
+    static func ==(lhs: Coordinate, rhs: Coordinate) -> Bool {
         return lhs.x == rhs.x && lhs.y == rhs.y
     }
 }
 
-var food = Coord(x: 10, y: 10)
+var food = Coordinate(x: 10, y: 10)
 
 enum Direction: Int {
     case up
@@ -37,36 +37,36 @@ enum Direction: Int {
 
 
 class Snake{
-    var body = [Coord(x: 25, y: 5), Coord(x: 25, y: 4),Coord(x: 25, y: 3), Coord(x: 25, y: 2), Coord(x: 25, y: 1), Coord(x: 25, y: 0)]
+    var body = [Coordinate(x: 25, y: 5), Coordinate(x: 25, y: 4),Coordinate(x: 25, y: 3), Coordinate(x: 25, y: 2), Coordinate(x: 25, y: 1), Coordinate(x: 25, y: 0)]
     var direction = Direction.down
     func move(nextDirection: Direction){
-        let newCoord: Coord?
+        let newCoordinate: Coordinate?
         self.direction = nextDirection
         
         switch self.direction{
            case .up:
-            newCoord = Coord(x: self.body[0].x, y: self.body[0].y - 1)
+            newCoordinate = Coordinate(x: self.body[0].x, y: self.body[0].y - 1)
             break
            case .down:
-            newCoord = Coord(x: self.body[0].x, y: self.body[0].y + 1)
+            newCoordinate = Coordinate(x: self.body[0].x, y: self.body[0].y + 1)
            case .left:
-            newCoord = Coord(x: self.body[0].x - 1, y: self.body[0].y)
+            newCoordinate = Coordinate(x: self.body[0].x - 1, y: self.body[0].y)
            case .right:
-            newCoord = Coord(x: self.body[0].x + 1, y: self.body[0].y)
+            newCoordinate = Coordinate(x: self.body[0].x + 1, y: self.body[0].y)
         }
-        self.body.insert(newCoord!, at: 0)
+        self.body.insert(newCoordinate!, at: 0)
         self.body.removeLast()
     }
 }
 
 protocol Projectile{
-    var currentChar: String {get set}
-    var coord: Coord {get set}
+    var currentCharacter: String {get set}
+    var coordinate: Coordinate {get set}
 }
 
 protocol CircularMovement: Projectile{
-    var dir: Direction {get}
-    var coord: Coord {get set}
+    var direction: Direction {get}
+    var coordinate: Coordinate {get set}
     var numStages: Int {get set}
     var phaseCharacters: [String] {get}
     var stage: Int {get set}
@@ -75,54 +75,54 @@ protocol CircularMovement: Projectile{
 extension CircularMovement{
     mutating func move(){
         var xVal = 1
-        if self.dir == .left{
+        if self.direction == .left{
             xVal = -1
         }
         let stageInLife = self.stage % self.numStages
         switch stageInLife{
             case 0:
-                self.coord = Coord(x: self.coord.x + 2 * xVal, y: self.coord.y + 1)
+                self.coordinate = Coordinate(x: self.coordinate.x + 2 * xVal, y: self.coordinate.y + 1)
                 break
             case 1:
-                self.coord = Coord(x: self.coord.x + 2 * xVal, y: self.coord.y - 1)
+                self.coordinate = Coordinate(x: self.coordinate.x + 2 * xVal, y: self.coordinate.y - 1)
                 break
             case 2:
-                self.coord = Coord(x: self.coord.x - 1 * xVal, y: self.coord.y - 1)
+                self.coordinate = Coordinate(x: self.coordinate.x - 1 * xVal, y: self.coordinate.y - 1)
                 break
             case 3:
-                self.coord = Coord(x: self.coord.x + 2 * xVal, y: self.coord.y + 1)
+                self.coordinate = Coordinate(x: self.coordinate.x + 2 * xVal, y: self.coordinate.y + 1)
                 break
             default:
                 break
         }
         stage = stage + 1
-        self.currentChar = self.phaseCharacters[stage % self.phaseCharacters.count]
+        self.currentCharacter = self.phaseCharacters[stage % self.phaseCharacters.count]
     }
 }
 
 class ArrowProjectile: Projectile{
-    var currentChar = "V"
-    var coord: Coord
-    init(startingCoord: Coord){
-        coord = startingCoord
+    var currentCharacter = "V"
+    var coordinate: Coordinate
+    init(startingCoord: Coordinate){
+        coordinate = startingCoord
     }
     
     func move(){
-        self.coord = Coord(x: self.coord.x, y: self.coord.y + 1)
+        self.coordinate = Coordinate(x: self.coordinate.x, y: self.coordinate.y + 1)
     }
 }
 
 class SlashProjectile: Projectile, CircularMovement{
-    var currentChar: String = "/"
-    var coord: Coord
-    var dir: Direction
+    var currentCharacter: String = "/"
+    var coordinate: Coordinate
+    var direction: Direction
     var numStages: Int = 4
     var stage: Int = 0
     var phaseCharacters: [String] = ["\\", "/"]
    
-    init(startingCoord: Coord, direction: Direction){
-        coord = startingCoord
-        dir = direction
+    init(startingCoordinate: Coordinate, direction: Direction){
+        self.coordinate = startingCoordinate
+        self.direction = direction
     }
 }
 
@@ -145,8 +145,8 @@ class Game {
     func isGameOver(){
         func isSnakeOverlapping() -> Bool{
             for limb in snake.body{
-                let limbsWithSameCoord = snake.body.filter{$0 == limb}
-                if limbsWithSameCoord.count > 1{
+                let limbsWithSameCoordinate = snake.body.filter{$0 == limb}
+                if limbsWithSameCoordinate.count > 1{
                     return true
                 }
             }
@@ -177,11 +177,11 @@ class Game {
     }
 
 
-    func generateNewFoodCoords() -> Coord {
-        return Coord(x: Int(arc4random_uniform(UInt32(MAPWIDTH-15))) + 5, y: Int(arc4random_uniform(UInt32(MAPHEIGHT - 10 ))) + 5)
+    func generateNewFoodCoords() -> Coordinate {
+        return Coordinate(x: Int(arc4random_uniform(UInt32(MAPWIDTH-15))) + 5, y: Int(arc4random_uniform(UInt32(MAPHEIGHT - 10 ))) + 5)
     }
     func isProjectileAttackingSnake(projectile: Projectile) -> Bool{
-        return snake.body.contains(projectile.coord)
+        return snake.body.contains(projectile.coordinate)
     }
     func isPlayerKilled() -> Bool {
         var projectiles = [Projectile?]()
@@ -203,32 +203,32 @@ class Game {
     }
     func deleteOffMapProjectiles(){
         if let slashProjectile = slashProjectile1{
-            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+            if slashProjectile.coordinate.x < 0 || slashProjectile.coordinate.x > MAPWIDTH{
                 slashProjectile1 = nil
             }
         }
         if let slashProjectile = slashProjectile2{
-            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+            if slashProjectile.coordinate.x < 0 || slashProjectile.coordinate.x > MAPWIDTH{
                 slashProjectile2 = nil
             }
         }
         if let slashProjectile = slashProjectile3{
-            if slashProjectile.coord.x < 0 || slashProjectile.coord.x > MAPWIDTH{
+            if slashProjectile.coordinate.x < 0 || slashProjectile.coordinate.x > MAPWIDTH{
                 slashProjectile3 = nil
             }
         }
         if let arrowProjectile = arrowProjectile1{
-            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+            if arrowProjectile.coordinate.x < 0 || arrowProjectile.coordinate.y > MAPWIDTH{
                 arrowProjectile1 = nil
             }
         }
         if let arrowProjectile = arrowProjectile2{
-            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+            if arrowProjectile.coordinate.x < 0 || arrowProjectile.coordinate.y > MAPWIDTH{
                 arrowProjectile2 = nil
             }
         }
         if let arrowProjectile = arrowProjectile3{
-            if arrowProjectile.coord.x < 0 || arrowProjectile.coord.y > MAPWIDTH{
+            if arrowProjectile.coordinate.x < 0 || arrowProjectile.coordinate.y > MAPWIDTH{
                 arrowProjectile3 = nil
             }
         }
@@ -274,7 +274,7 @@ class Game {
         for y in 0 ..< MAPHEIGHT {
             print("|", terminator:"")
             for x in 0 ..< MAPWIDTH {
-                let coord = Coord(x: x, y: y)
+                let coord = Coordinate(x: x, y: y)
                 var projectilePrinted = false
                 var coinPrinted = false
                 var snakeBodyPartIsThere = false
@@ -290,8 +290,8 @@ class Game {
                 }
                 if !coinPrinted {
                     if let projectile = slashProjectile1{
-                        if coord == projectile.coord{
-                            print(projectile.currentChar, terminator:"")
+                        if coord == projectile.coordinate{
+                            print(projectile.currentCharacter, terminator:"")
                             projectilePrinted = true
 
                         }
@@ -299,8 +299,8 @@ class Game {
                     }
                     if let projectile = slashProjectile2{
                         
-                        if coord == projectile.coord{
-                            print(projectile.currentChar, terminator:"")
+                        if coord == projectile.coordinate{
+                            print(projectile.currentCharacter, terminator:"")
                             projectilePrinted = true
                             
                         }
@@ -308,27 +308,27 @@ class Game {
                     }
                     if let projectile = slashProjectile3{
                         
-                        if coord == projectile.coord{
-                            print(projectile.currentChar, terminator:"")
+                        if coord == projectile.coordinate{
+                            print(projectile.currentCharacter, terminator:"")
                             projectilePrinted = true
                         }
                         
                     }
                     if let projectile = arrowProjectile1{
-                        if coord == projectile.coord{
-                            print(projectile.currentChar, terminator:"")
+                        if coord == projectile.coordinate{
+                            print(projectile.currentCharacter, terminator:"")
                             projectilePrinted = true
                         }
                     }
                     if let projectile = arrowProjectile2{
-                        if coord == projectile.coord{
-                            print(projectile.currentChar, terminator:"")
+                        if coord == projectile.coordinate{
+                            print(projectile.currentCharacter, terminator:"")
                             projectilePrinted = true
                         }
                     }
                     if let projectile = arrowProjectile3{
-                        if coord == projectile.coord{
-                            print(projectile.currentChar, terminator:"")
+                        if coord == projectile.coordinate{
+                            print(projectile.currentCharacter, terminator:"")
                             projectilePrinted = true
                         }
                     }
@@ -358,60 +358,60 @@ func tutorial(){
         print("Once you type in your direction, press the enter key to execute it")
         print("If you take to long to move, you will die.")
         print("press ENTER to start game.")
-        l = readLine() ?? ""
+        userInput = readLine() ?? ""
 }
 
-func playGame() {
-    let g = Game()
-    g.drawMap()
+func startGame() {
+    let game = Game()
+    game.drawMap()
 
-    while l != "q" {
-        l = readLine() ?? ""
+    while userInput != "q" {
+        userInput = readLine() ?? ""
         let weaponDeterminer = Int(arc4random_uniform(UInt32(5)))
         
         switch weaponDeterminer{ //randomly chooses which projectile to shoot out
             case 0:
-                if(g.slashProjectile1 == nil){
+                if(game.slashProjectile1 == nil){
                     let sideDeterminer = Int(arc4random_uniform(UInt32(2)))
                     if(sideDeterminer == 0){
-                        g.slashProjectile1 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
+                        game.slashProjectile1 = SlashProjectile(startingCoordinate: Coordinate(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
                     }
                     else{
-                        g.slashProjectile1 = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
+                        game.slashProjectile1 = SlashProjectile(startingCoordinate: Coordinate(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
                     }
                 }
             
             case 1:
-                if(g.slashProjectile2 == nil){
+                if(game.slashProjectile2 == nil){
                     let sideDeterminer = Int(arc4random_uniform(UInt32(2)))
                     if(sideDeterminer == 0){
-                        g.slashProjectile2 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
+                        game.slashProjectile2 = SlashProjectile(startingCoordinate: Coordinate(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
                     }
                     else{
-                        g.slashProjectile2 = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
+                        game.slashProjectile2 = SlashProjectile(startingCoordinate: Coordinate(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
                     }
                 }
             case 2:
-                if(g.slashProjectile3 == nil){
+                if(game.slashProjectile3 == nil){
                     let sideDeterminer = Int(arc4random_uniform(UInt32(2)))
                     if(sideDeterminer == 0){
-                        g.slashProjectile3 = SlashProjectile(startingCoord: Coord(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
+                        game.slashProjectile3 = SlashProjectile(startingCoordinate: Coordinate(x: 0, y: Int(arc4random_uniform(UInt32(20)))) , direction: .right)
                     }
                     else{
-                        g.slashProjectile3 = SlashProjectile(startingCoord: Coord(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
+                        game.slashProjectile3 = SlashProjectile(startingCoordinate: Coordinate(x: 49, y: Int(arc4random_uniform(UInt32(20)))) , direction: .left)
                     }
                 }
             case 3:
-                if(g.arrowProjectile1 == nil ){
-                    g.arrowProjectile1 = ArrowProjectile(startingCoord: Coord(x: Int(arc4random_uniform(UInt32(49))), y: 0))
+                if(game.arrowProjectile1 == nil ){
+                    game.arrowProjectile1 = ArrowProjectile(startingCoord: Coordinate(x: Int(arc4random_uniform(UInt32(49))), y: 0))
                 }
             case 4:
-                if(g.arrowProjectile2 == nil ){
-                    g.arrowProjectile2 = ArrowProjectile(startingCoord: Coord(x: Int(arc4random_uniform(UInt32(49))), y: 0))
+                if(game.arrowProjectile2 == nil ){
+                    game.arrowProjectile2 = ArrowProjectile(startingCoord: Coordinate(x: Int(arc4random_uniform(UInt32(49))), y: 0))
                 }
             case 5:
-                if(g.arrowProjectile3 == nil ){
-                    g.arrowProjectile3 = ArrowProjectile(startingCoord: Coord(x: Int(arc4random_uniform(UInt32(49))), y: 0))
+                if(game.arrowProjectile3 == nil ){
+                    game.arrowProjectile3 = ArrowProjectile(startingCoord: Coordinate(x: Int(arc4random_uniform(UInt32(49))), y: 0))
                 }
             default:
                 break
@@ -429,30 +429,30 @@ func playGame() {
            break
        }
         date = Date()
-        if (l != ""){
-            if l == "w" || l == "a" || l == "s" || l == "d" {
-                lastPressedButton = l
+        if (userInput != ""){
+            if userInput == "w" || userInput == "a" || userInput == "s" || userInput == "d" {
+                lastPressedButton = userInput
             }
             else{
-                l = lastPressedButton
+                userInput = lastPressedButton
             }
         }
         else{
-            l = lastPressedButton
+            userInput = lastPressedButton
         }
-        switch l{
+        switch userInput{
             case "w":
-                g.snake.move(nextDirection: .up)
+                game.snake.move(nextDirection: .up)
             case "a":
-                g.snake.move(nextDirection: .left)
+                game.snake.move(nextDirection: .left)
             case "s":
-                g.snake.move(nextDirection: .down)
+                game.snake.move(nextDirection: .down)
             case "d":
-                g.snake.move(nextDirection: .right)
+                game.snake.move(nextDirection: .right)
             default:
                 break
         }
-        g.drawMap()
+        game.drawMap()
     }
 }
 
@@ -464,4 +464,4 @@ func gameOverMessage(_ message: String){
 
 
 tutorial()
-playGame()
+startGame()
