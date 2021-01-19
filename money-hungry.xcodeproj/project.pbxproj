@@ -11,6 +11,8 @@
 		9D7F9D3025B6493B00A43ED5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D1425B641F400A43ED5 /* main.swift */; };
 		9D9CFAD025B6707E009F4F03 /* static.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9CFACF25B6707E009F4F03 /* static.swift */; };
 		9D9CFADA25B672E4009F4F03 /* static.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9CFACF25B6707E009F4F03 /* static.swift */; };
+		9D9CFAE425B679F9009F4F03 /* gameSpecific.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9CFAE325B679F9009F4F03 /* gameSpecific.swift */; };
+		9D9CFAE725B67DB1009F4F03 /* gameSpecific.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9CFAE325B679F9009F4F03 /* gameSpecific.swift */; };
 		9DF8803025B6535400896BF6 /* money_hungry_tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D2225B646CE00A43ED5 /* money_hungry_tests.swift */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +35,7 @@
 		9D7F9D2225B646CE00A43ED5 /* money_hungry_tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = money_hungry_tests.swift; sourceTree = "<group>"; };
 		9D7F9D2425B646CE00A43ED5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D9CFACF25B6707E009F4F03 /* static.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = static.swift; sourceTree = "<group>"; };
+		9D9CFAE325B679F9009F4F03 /* gameSpecific.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gameSpecific.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				9D9CFACF25B6707E009F4F03 /* static.swift */,
+				9D9CFAE325B679F9009F4F03 /* gameSpecific.swift */,
 			);
 			path = display;
 			sourceTree = "<group>";
@@ -185,6 +189,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9CFAE425B679F9009F4F03 /* gameSpecific.swift in Sources */,
 				9D7F9D1525B641F400A43ED5 /* main.swift in Sources */,
 				9D9CFAD025B6707E009F4F03 /* static.swift in Sources */,
 			);
@@ -194,6 +199,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9CFAE725B67DB1009F4F03 /* gameSpecific.swift in Sources */,
 				9D9CFADA25B672E4009F4F03 /* static.swift in Sources */,
 				9D7F9D3025B6493B00A43ED5 /* main.swift in Sources */,
 				9DF8803025B6535400896BF6 /* money_hungry_tests.swift in Sources */,

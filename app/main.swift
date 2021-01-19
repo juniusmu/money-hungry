@@ -164,13 +164,13 @@ class Game {
             return false
         }
         if isSnakeOverlapping(){
-            gameOverMessage("You Got In Your Own Way :(")
+            gameOverMessage(message: "You Got In Your Own Way :(", score: score)
         }
         if isSnakeOutOfBounds(){
-            gameOverMessage("You hit a wall")
+            gameOverMessage(message: "You hit a wall", score: score)
         }
         if isPlayerKilled() {
-            gameOverMessage("Killed")
+            gameOverMessage(message: "Killed", score: score)
             return
         }
 
@@ -425,7 +425,7 @@ func startGame() {
             date = currentDate
         }
        if currentDate > Date(timeInterval:1, since: date){
-           gameOverMessage("Took Too Long To Make A Decision")
+        gameOverMessage(message: "Took Too Long To Make A Decision", score: score)
            break
        }
         date = Date()
@@ -455,13 +455,6 @@ func startGame() {
         game.drawMap()
     }
 }
-
-func gameOverMessage(_ message: String){
-    print("Game Over: \(message)")
-    print("Score: \(score)")
-    exit(1)
-}
-
 
 tutorial()
 startGame()
