@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		9D7F9D1525B641F400A43ED5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D1425B641F400A43ED5 /* main.swift */; };
 		9D7F9D3025B6493B00A43ED5 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D1425B641F400A43ED5 /* main.swift */; };
+		9D9CFAD025B6707E009F4F03 /* static.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9CFACF25B6707E009F4F03 /* static.swift */; };
+		9D9CFADA25B672E4009F4F03 /* static.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9CFACF25B6707E009F4F03 /* static.swift */; };
 		9DF8803025B6535400896BF6 /* money_hungry_tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F9D2225B646CE00A43ED5 /* money_hungry_tests.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +32,7 @@
 		9D7F9D2025B646CE00A43ED5 /* money-hungry-tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "money-hungry-tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D7F9D2225B646CE00A43ED5 /* money_hungry_tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = money_hungry_tests.swift; sourceTree = "<group>"; };
 		9D7F9D2425B646CE00A43ED5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9D9CFACF25B6707E009F4F03 /* static.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = static.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +74,7 @@
 		9D7F9D1325B641F400A43ED5 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				9D9CFACC25B66B27009F4F03 /* display */,
 				9D7F9D1425B641F400A43ED5 /* main.swift */,
 			);
 			path = app;
@@ -83,6 +87,14 @@
 				9D7F9D2425B646CE00A43ED5 /* Info.plist */,
 			);
 			path = tests;
+			sourceTree = "<group>";
+		};
+		9D9CFACC25B66B27009F4F03 /* display */ = {
+			isa = PBXGroup;
+			children = (
+				9D9CFACF25B6707E009F4F03 /* static.swift */,
+			);
+			path = display;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -174,6 +186,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D7F9D1525B641F400A43ED5 /* main.swift in Sources */,
+				9D9CFAD025B6707E009F4F03 /* static.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -181,6 +194,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D9CFADA25B672E4009F4F03 /* static.swift in Sources */,
 				9D7F9D3025B6493B00A43ED5 /* main.swift in Sources */,
 				9DF8803025B6535400896BF6 /* money_hungry_tests.swift in Sources */,
 			);

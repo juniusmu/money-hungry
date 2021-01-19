@@ -256,16 +256,6 @@ class Game {
     }
 
     func drawMap(){
-        
-        func printLogo(){
-            print(" _____                    _____                     ")
-            print("|     |___ ___ ___ _ _   |  |  |_ _ ___ ___ ___ _ _ ")
-            print("| | | | . |   | -_| | |  |     | | |   | . |  _| | |")
-            print("|_|_|_|___|_|_|___|_  |  |__|__|___|_|_|_  |_| |_  |")
-            print("                  |___|                |___|   |___|")
-        }
-
-        
         if snake.body.contains(food){
             food = generateNewFoodCoords()
             score = score + 1
